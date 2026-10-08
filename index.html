@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EcoAcoustic-AI | Erzurum OGM Canlı İzleme</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0d1117;
+  --bg-2: #161b22;
+  --bg-3: #1f2630;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --primary: #2ea043;
+  --primary-dark: #238636;
+  --danger: #f85149;
+  --warning: #d29922;
+  --info: #58a6ff;
+  --fire: #ff6b35;
+  --chainsaw: #f0b429;
+  --gunshot: #e5484d;
+  --tamper: #a371f7;
+  --radius: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ============ ÜST BAR ============ */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.logo {
+  font-size: 32px;
+  filter: drop-shadow(0 0 10px rgba(46,160,67,.5));
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.brand h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+.subtitle { font-size: 11px; color: var(--text-dim); }
+
+.status-group { display: flex; align-items: center; gap: 16px; }
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-3);
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+}
+
+.status-pill .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+  animation: blink 1.5s infinite;
+}
+
+.status-pill.connected .dot { background: var(--primary); animation: none; }
+.status-pill.disconnected .dot { background: var(--danger); animation: none; }
+
+@keyframes blink { 50% { opacity: .3; } }
+
+.clock {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--text-dim);
+  padding: 6px 12px;
+  background: var(--bg-3);
+  border-radius: 8px;
+}
+
+/* ============ LAYOUT ============ */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ============ HARİTA BÖLÜMÜ ============ */
+.map-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-height: 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.panel-header h2 { font-size: 14px; font-weight: 600; }
+
+.ogm-badge {
+  font-size: 10px;
+  color: #2ea043;
+  padding: 2px 8px;
+  background: rgba(46,160,67,.15);
+  border: 1px solid rgba(46,160,67,.4);
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+.map-filters { display: flex; gap: 6px; }
+
+.filter-btn {
+  padding: 6px 12px;
+  background: var(--bg-3);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+
+.filter-btn:hover { color: var(--text); border-color: var(--primary); }
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+#map { flex: 1; min-height: 0; position: relative; z-index: 1; }
+
+/* Orman temalı tile filtresi */
+.leaflet-container {
+  background: #1a2e1a;
+  font-family: inherit;
+}
+.leaflet-tile {
+  filter: saturate(1.25) contrast(1.05) brightness(0.95);
+}
+.leaflet-popup-content-wrapper {
+  background: var(--bg-2);
+  color: var(--text);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0,0,0,.6);
+}
+.leaflet-popup-tip { background: var(--bg-2); }
+.leaflet-popup-close-button { color: var(--text-dim) !important; }
+.leaflet-control-zoom a {
+  background: var(--bg-2) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: var(--bg-3) !important;
+}
+
+/* ============ HIZLI İSTATİSTİK ============ */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.qs-item {
+  background: var(--bg-2);
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qs-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; }
+.qs-value { font-size: 18px; font-weight: 700; }
+.qs-value.ok { color: var(--primary); }
+.qs-value.warn { color: var(--warning); }
+.qs-value.bad { color: var(--danger); }
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+  background: var(--bg-2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  font-family: inherit;
+}
+
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: var(--bg-2);
+}
+
+.tab-content { display: none; flex: 1; overflow-y: auto; padding: 12px; min-height: 0; }
+.tab-content.active { display: block; }
+
+.tab-content::-webkit-scrollbar { width: 6px; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ============ ALARM LİSTESİ ============ */
+.alerts-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.alerts-toolbar input,
+.alerts-toolbar select {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.alerts-toolbar input:focus,
+.alerts-toolbar select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.alert-list { display: flex; flex-direction: column; gap: 8px; }
+
+.alert-card {
+  background: var(--bg-3);
+  border-left: 4px solid var(--info);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all .2s;
+  animation: slideIn .3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.alert-card:hover {
+  background: var(--bg);
+  transform: translateX(-4px);
+  box-shadow: var(--shadow);
+}
+
+.alert-card.chainsaw { border-left-color: var(--chainsaw); }
+.alert-card.fire { border-left-color: var(--fire); }
+.alert-card.gunshot { border-left-color: var(--gunshot); }
+.alert-card.tamper { border-left-color: var(--tamper); }
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.alert-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.alert-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.alert-badge.high { background: var(--danger); }
+.alert-badge.med { background: var(--warning); color: #000; }
+
+.alert-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.alert-coords { font-family: 'Courier New', monospace; }
+
+/* ============ DÜĞÜM LİSTESİ ============ */
+.node-list { display: flex; flex-direction: column; gap: 8px; }
+
+.node-card {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  transition: all .2s;
+}
+
+.node-card:hover { border-color: var(--primary); }
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.node-id {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.node-status {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+}
+
+.node-status.offline { background: var(--danger); }
+.node-status.lowbat { background: var(--warning); color: #000; }
+
+.node-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.node-info span strong { color: var(--text); }
+
+/* ============ İSTATİSTİK ============ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-title {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.chart-box {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.chart-box h3 {
+  font-size: 12px;
+  margin-bottom: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.battery-list { display: flex; flex-direction: column; gap: 8px; }
+
+.battery-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.battery-item .node-label {
+  width: 50px;
+  font-family: 'Courier New', monospace;
+  color: var(--text-dim);
+}
+
+.battery-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.battery-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width .5s ease;
+}
+
+.battery-fill.low { background: var(--danger); }
+.battery-fill.med { background: var(--warning); }
+
+.battery-pct { width: 40px; text-align: right; font-weight: 600; }
+
+/* ============ ALARM POPUP ============ */
+.alarm-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.alarm-popup.show { display: flex; animation: fadeIn .3s; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.alarm-popup-inner {
+  background: var(--bg-2);
+  border: 2px solid var(--danger);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(248,81,73,.4);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes popIn {
+  from { transform: scale(.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.alarm-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+  animation: shake .5s infinite;
+}
+
+@keyframes shake {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.alarm-popup-inner h3 {
+  font-size: 20px;
+  color: var(--danger);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.alarm-popup-inner p {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.alarm-actions { display: flex; gap: 10px; }
+
+.alarm-actions button {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-3);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .2s;
+  font-family: inherit;
+}
+
+.alarm-actions button.primary {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.alarm-actions button:hover { transform: translateY(-2px); }
+
+/* ============ FOOTER ============ */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+#footerMode {
+  padding: 2px 8px;
+  background: var(--bg-3);
+  border-radius: 4px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .sidebar { border-left: none; border-top: 1px solid var(--border); }
+}
+
+@media (max-width: 700px) {
+  .quick-stats { grid-template-columns: 1fr 1fr; }
+  .brand h1 { font-size: 14px; }
+  .subtitle { display: none; }
+}
+
+/* ============ ÖZEL MARKER ============ */
+.custom-marker {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 15px currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  animation: markerPulse 2s infinite;
+}
+
+@keyframes markerPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: .85; }
+}
+
+.marker-chainsaw { background: var(--chainsaw); color: var(--chainsaw); }
+.marker-fire { background: var(--fire); color: var(--fire); }
+.marker-gunshot { background: var(--gunshot); color: var(--gunshot); }
+.marker-tamper { background: var(--tamper); color: var(--tamper); }
+
+.pulse-ring {
+  position: absolute;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--danger);
+  animation: ringPulse 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes ringPulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ÜST BAR ============ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">🌲</div>
+    <div>
+      <h1>EcoAcoustic-AI</h1>
+      <span class="subtitle">Erzurum Bölgesi — Otonom Akustik Orman Koruma Sistemi</span>
+    </div>
+  </div>
+  <div class="status-group">
+    <div class="status-pill" id="connStatus">
+      <span class="dot"></span>
+      <span id="connText">Bağlanıyor...</span>
+    </div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- ============ ANA LAYOUT ============ -->
+<main class="layout">
+  <section class="map-section">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h2>🗺️ Canlı Tehdit Haritası — Erzurum</h2>
+        <span class="ogm-badge">🌲 OGM ENTEGRE</span>
+      </div>
+      <div class="map-filters">
+        <button class="filter-btn active" data-filter="all">Tümü</button>
+        <button class="filter-btn" data-filter="chainsaw">🪚 Testere</button>
+        <button class="filter-btn" data-filter="fire">🔥 Yangın</button>
+        <button class="filter-btn" data-filter="gunshot">🔫 Silah</button>
+        <button class="filter-btn" data-filter="tamper">⚠️ Kurcalama</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="quick-stats">
+      <div class="qs-item">
+        <span class="qs-label">Aktif Düğüm</span>
+        <span class="qs-value" id="qsNodes">0</span>
+      </div>
+      <div class="qs-item">
+        <span class="qs-label">Bugünkü Alarm</span>
+        <span class="qs-value" id="qsAlerts">0</span>
+      </div>
+      <div class="qs-item">
+        <span class="qs-label">Ortalama Güven</span>
+        <span class="qs-value" id="qsConf">0%</span>
+      </div>
+      <div class="qs-item">
+        <span class="qs-label">Sistem Sağlığı</span>
+        <span class="qs-value ok" id="qsHealth">İyi</span>
+      </div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <div class="tabs">
+      <button class="tab active" data-tab="alerts">🚨 Alarmlar</button>
+      <button class="tab" data-tab="nodes">📡 Düğümler</button>
+      <button class="tab" data-tab="stats">📊 İstatistik</button>
+    </div>
+
+    <div class="tab-content active" id="tab-alerts">
+      <div class="alerts-toolbar">
+        <input type="text" id="alertSearch" placeholder="🔍 Alarm ara..." />
+        <select id="alertFilter">
+          <option value="all">Tüm tehditler</option>
+          <option value="chainsaw">Motorlu Testere</option>
+          <option value="fire">Yangın</option>
+          <option value="gunshot">Silah Sesi</option>
+          <option value="tamper">Kurcalama</option>
+        </select>
+      </div>
+      <div class="alert-list" id="alertList"></div>
+    </div>
+
+    <div class="tab-content" id="tab-nodes">
+      <div class="node-list" id="nodeList"></div>
+    </div>
+
+    <div class="tab-content" id="tab-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Toplam Alarm</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Bugün</div>
+          <div class="stat-value" id="statToday">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Doğruluk</div>
+          <div class="stat-value" id="statAcc">94.2%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Ort. Gecikme</div>
+          <div class="stat-value" id="statLat">1.2s</div>
+        </div>
+      </div>
+      <div class="chart-box">
+        <h3>Tehdit Dağılımı</h3>
+        <canvas id="threatChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Saatlik Alarm Yoğunluğu</h3>
+        <canvas id="hourlyChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Düğüm Pil Seviyeleri</h3>
+        <div id="batteryList" class="battery-list"></div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ============ ALARM POPUP ============ -->
+<div class="alarm-popup" id="alarmPopup">
+  <div class="alarm-popup-inner">
+    <div class="alarm-icon" id="alarmIcon">🚨</div>
+    <h3 id="alarmTitle">YENİ TEHDİT</h3>
+    <p id="alarmDesc">--</p>
+    <div class="alarm-actions">
+      <button id="alarmClose">Kapat</button>
+      <button id="alarmGo" class="primary">Haritada Gör</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <span>© 2026 Teknotim — TEKNOFEST Çevre ve Enerji Teknolojileri | Erzurum Bölgesi</span>
+  <span id="footerMode">Mod: Demo</span>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// VERİ — ERZURUM ORMAN BÖLGELERİ
+// ============================================================
+const NODE_POSITIONS = [
+  { id: 'ECO-01', lat: 39.9043, lon: 41.2679, name: 'Erzurum Merkez' },
+  { id: 'ECO-02', lat: 39.8456, lon: 41.3456, name: 'Palandöken Ormanı' },
+  { id: 'ECO-03', lat: 40.0123, lon: 41.4567, name: 'Tortum Şelalesi' },
+  { id: 'ECO-04', lat: 40.2345, lon: 42.1234, name: 'Şenkaya Ormanı' },
+  { id: 'ECO-05', lat: 39.7567, lon: 41.1234, name: 'Ilıca Ormanı' },
+  { id: 'ECO-06', lat: 40.1234, lon: 41.6789, name: 'Uzundere Vadisi' },
+];
+
+const THREAT_TYPES = [
+  { type: 'chainsaw', label: 'Motorlu Testere', icon: '🪚', confRange: [0.88, 0.97], color: '#f0b429' },
+  { type: 'fire', label: 'Yangın Çıtırtısı', icon: '🔥', confRange: [0.85, 0.96], color: '#ff6b35' },
+  { type: 'gunshot', label: 'Silah Sesi', icon: '🔫', confRange: [0.90, 0.99], color: '#e5484d' },
+  { type: 'tamper', label: 'Kurcalama', icon: '⚠️', confRange: [0.95, 1.0], color: '#a371f7' },
+];
+
+// ============================================================
+// DEMO ENGINE
+// ============================================================
+class DemoDataEngine {
+  constructor() {
+    this.alerts = [];
+    this.nodes = NODE_POSITIONS.map(n => ({
+      ...n,
+      battery: 3.2 + Math.random() * 0.9,
+      status: 'online',
+      lastSeen: Date.now(),
+      rssi: -60 - Math.floor(Math.random() * 40),
+      alarmsToday: 0,
+    }));
+    this.listeners = [];
+    this.running = false;
+    this.alertCount = 0;
+  }
+
+  onEvent(cb) { this.listeners.push(cb); }
+  emit(event) { this.listeners.forEach(cb => cb(event)); }
+
+  generateAlert() {
+    const node = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+    const isThreat = Math.random() > 0.3;
+    if (!isThreat) return null;
+
+    const threat = THREAT_TYPES[Math.floor(Math.random() * THREAT_TYPES.length)];
+    const conf = threat.confRange[0] + Math.random() * (threat.confRange[1] - threat.confRange[0]);
+
+    const lat = node.lat + (Math.random() - 0.5) * 0.008;
+    const lon = node.lon + (Math.random() - 0.5) * 0.008;
+
+    this.alertCount++;
+    node.alarmsToday++;
+
+    return {
+      id: `ALR-${Date.now()}-${this.alertCount}`,
+      nodeId: node.id,
+      nodeName: node.name,
+      threatType: threat.type,
+      threatLabel: threat.label,
+      icon: threat.icon,
+      color: threat.color,
+      confidence: conf,
+      latitude: lat,
+      longitude: lon,
+      battery: node.battery,
+      rssi: node.rssi,
+      timestamp: new Date().toISOString(),
+      severity: conf > 0.93 ? 'high' : conf > 0.88 ? 'med' : 'low',
+    };
+  }
+
+  start(intervalMs = 8000) {
+    if (this.running) return;
+    this.running = true;
+
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        const a = this.generateAlert();
+        if (a) {
+          this.alerts.unshift(a);
+          this.emit({ type: 'alert', data: a });
+        }
+      }, i * 1500);
+    }
+
+    this.interval = setInterval(() => {
+      const alert = this.generateAlert();
+      if (alert) {
+        this.alerts.unshift(alert);
+        if (this.alerts.length > 200) this.alerts.pop();
+        this.emit({ type: 'alert', data: alert });
+      }
+      this.nodes.forEach(n => {
+        n.battery -= 0.001 + Math.random() * 0.002;
+        if (n.battery < 3.0) n.status = 'lowbat';
+        if (n.battery < 2.8) n.status = 'offline';
+      });
+      this.emit({ type: 'nodes', data: this.nodes });
+    }, intervalMs);
+
+    setTimeout(() => {
+      this.emit({ type: 'connected', data: { mode: 'demo' } });
+    }, 800);
+  }
+
+  getStats() {
+    const today = new Date().toDateString();
+    const todayAlerts = this.alerts.filter(a => new Date(a.timestamp).toDateString() === today);
+    const byType = {};
+    THREAT_TYPES.forEach(t => {
+      byType[t.type] = this.alerts.filter(a => a.threatType === t.type).length;
+    });
+    const hourly = Array(24).fill(0);
+    this.alerts.forEach(a => { hourly[new Date(a.timestamp).getHours()]++; });
+    const avgConf = this.alerts.length
+      ? this.alerts.reduce((s, a) => s + a.confidence, 0) / this.alerts.length
+      : 0;
+    return { total: this.alerts.length, today: todayAlerts.length, avgConfidence: avgConf, byType, hourly, nodes: this.nodes };
+  }
+}
+
+// ============================================================
+// HARİTA — ERZURUM ORMAN TEMALI
+// ============================================================
+class ThreatMap {
+  constructor(containerId) {
+    this.map = L.map(containerId, {
+      center: [39.9043, 41.2679],   // Erzurum merkez
+      zoom: 9,
+      zoomControl: true,
+      attributionControl: false,
+    });
+
+    // 🌲 KATMAN 1: ESRI Uydu (gerçek orman görüntüsü)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: '© Esri'
+    }).addTo(this.map);
+
+    // 🏔️ KATMAN 2: Yollar ve yerleşim isimleri (üstte, transparan)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      opacity: 0.85,
+      pane: 'overlayPane'
+    }).addTo(this.map);
+
+    this.markers = new Map();
+    this.nodeMarkers = new Map();
+    this.filter = 'all';
+    this.initNodes();
+  }
+
+  initNodes() {
+    NODE_POSITIONS.forEach(node => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:#2ea043;border:2px solid #fff;box-shadow:0 0 12px #2ea043,0 0 4px #000;"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+      const marker = L.marker([node.lat, node.lon], { icon })
+        .addTo(this.map)
+        .bindPopup(`
+          <div style="font-family:sans-serif;font-size:12px;">
+            <strong style="color:#2ea043;">📡 ${node.id}</strong><br/>
+            <span style="color:#8b949e;">${node.name}</span><br/>
+            <span style="color:#2ea043;">● Aktif — Erzurum Bölgesi</span>
+          </div>
+        `);
+      this.nodeMarkers.set(node.id, marker);
+    });
+  }
+
+  addAlert(alert) {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="custom-marker marker-${alert.threatType}">${alert.icon}</div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+    });
+    const marker = L.marker([alert.latitude, alert.longitude], { icon })
+      .addTo(this.map)
+      .bindPopup(this.buildPopup(alert));
+
+    const pulseIcon = L.divIcon({
+      className: '',
+      html: `<div class="pulse-ring" style="border-color:${alert.color}"></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+    });
+    const pulse = L.marker([alert.latitude, alert.longitude], { icon: pulseIcon, interactive: false }).addTo(this.map);
+    setTimeout(() => this.map.removeLayer(pulse), 4500);
+
+    this.markers.set(alert.id, { marker, alert });
+    this.applyFilter();
+    this.map.flyTo([alert.latitude, alert.longitude], 12, { duration: 1.2 });
+  }
+
+  buildPopup(alert) {
+    const time = new Date(alert.timestamp).toLocaleString('tr-TR');
+    return `<div style="font-family:sans-serif;font-size:12px;min-width:220px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #30363d;">
+        <span style="font-size:22px;">${alert.icon}</span>
+        <div>
+          <strong style="color:${alert.color};font-size:13px;">${alert.threatLabel}</strong><br/>
+          <span style="color:#8b949e;font-size:10px;">${alert.nodeName}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 8px;font-size:11px;">
+        <span style="color:#8b949e">Düğüm:</span><span style="font-family:monospace;">${alert.nodeId}</span>
+        <span style="color:#8b949e">Güven:</span><span style="color:#2ea043;font-weight:700;">${(alert.confidence*100).toFixed(1)}%</span>
+        <span style="color:#8b949e">Konum:</span><span style="font-family:monospace;">${alert.latitude.toFixed(4)}, ${alert.longitude.toFixed(4)}</span>
+        <span style="color:#8b949e">Pil:</span><span>${alert.battery.toFixed(2)}V</span>
+        <span style="color:#8b949e">RSSI:</span><span>${alert.rssi} dBm</span>
+        <span style="color:#8b949e">Zaman:</span><span>${time}</span>
+      </div>
+    </div>`;
+  }
+
+  setFilter(type) { this.filter = type; this.applyFilter(); }
+
+  applyFilter() {
+    this.markers.forEach(({ marker, alert }) => {
+      const show = this.filter === 'all' || alert.threatType === this.filter;
+      if (show) { if (!this.map.hasLayer(marker)) marker.addTo(this.map); }
+      else { if (this.map.hasLayer(marker)) this.map.removeLayer(marker); }
+    });
+  }
+
+  focusAlert(alertId) {
+    const entry = this.markers.get(alertId);
+    if (entry) {
+      this.map.flyTo([entry.alert.latitude, entry.alert.longitude], 13, { duration: 1 });
+      entry.marker.openPopup();
+    }
+  }
+}
+
+// ============================================================
+// GRAFİKLER
+// ============================================================
+class StatsCharts {
+  constructor() {
+    const ctx1 = document.getElementById('threatChart').getContext('2d');
+    this.threatChart = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: ['Testere', 'Yangın', 'Silah', 'Kurcalama'],
+        datasets: [{
+          data: [0, 0, 0, 0],
+          backgroundColor: ['#f0b429', '#ff6b35', '#e5484d', '#a371f7'],
+          borderColor: '#161b22',
+          borderWidth: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { position: 'bottom', labels: { color: '#8b949e', font: { size: 11 }, padding: 12, boxWidth: 12 } } },
+        cutout: '65%',
+      }
+    });
+
+    const ctx2 = document.getElementById('hourlyChart').getContext('2d');
+    this.hourlyChart = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+        datasets: [{ label: 'Alarm', data: Array(24).fill(0), backgroundColor: '#2ea043', borderRadius: 4 }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#8b949e', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } },
+          y: { ticks: { color: '#8b949e', font: { size: 10 } }, grid: { color: '#30363d' }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  update(stats) {
+    this.threatChart.data.datasets[0].data = [
+      stats.byType.chainsaw || 0,
+      stats.byType.fire || 0,
+      stats.byType.gunshot || 0,
+      stats.byType.tamper || 0,
+    ];
+    this.threatChart.update('none');
+    this.hourlyChart.data.datasets[0].data = stats.hourly;
+    this.hourlyChart.update('none');
+  }
+}
+
+// ============================================================
+// ANA UYGULAMA
+// ============================================================
+class EcoAcousticApp {
+  constructor() {
+    this.alerts = [];
+    this.nodes = [];
+    this.currentFilter = 'all';
+    this.searchQuery = '';
+    this.init();
+  }
+
+  init() {
+    this.map = new ThreatMap('map');
+    this.charts = new StatsCharts();
+    this.bindUI();
+    this.bindDemoEngine();
+    this.startClock();
+    demoEngine.start(8000);
+    console.log('%c🌲 EcoAcoustic-AI — Erzurum Bölgesi hazır', 'color:#2ea043;font-size:16px;font-weight:bold;');
+  }
+
+  bindUI() {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+        if (tab.dataset.tab === 'stats') this.charts.update(demoEngine.getStats());
+      });
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.currentFilter = btn.dataset.filter;
+        this.map.setFilter(this.currentFilter);
+      });
+    });
+
+    document.getElementById('alertSearch').addEventListener('input', (e) => {
+      this.searchQuery = e.target.value.toLowerCase();
+      this.renderAlerts();
+    });
+
+    document.getElementById('alertFilter').addEventListener('change', () => {
+      this.renderAlerts();
+    });
+
+    document.getElementById('alarmClose').addEventListener('click', () => {
+      document.getElementById('alarmPopup').classList.remove('show');
+    });
+
+    document.getElementById('alarmGo').addEventListener('click', () => {
+      const id = document.getElementById('alarmPopup').dataset.alertId;
+      if (id) this.map.focusAlert(id);
+      document.getElementById('alarmPopup').classList.remove('show');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') document.getElementById('alarmPopup').classList.remove('show');
+    });
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  bindDemoEngine() {
+    demoEngine.onEvent((event) => {
+      if (event.type === 'connected') this.setConnected(true, 'Demo Modu');
+      else if (event.type === 'alert') this.handleNewAlert(event.data);
+      else if (event.type === 'nodes') {
+        this.nodes = event.data;
+        this.renderNodes();
+        this.renderBatteryList();
+      }
+    });
+  }
+
+  setConnected(status, text) {
+    const pill = document.getElementById('connStatus');
+    pill.classList.toggle('connected', status);
+    pill.classList.toggle('disconnected', !status);
+    document.getElementById('connText').textContent = text || (status ? 'Bağlı' : 'Bağlantı Yok');
+    document.getElementById('footerMode').textContent = `Mod: ${text || 'Demo'}`;
+  }
+
+  handleNewAlert(alert) {
+    this.alerts.unshift(alert);
+    if (this.alerts.length > 200) this.alerts.pop();
+    this.map.addAlert(alert);
+    this.renderAlerts();
+    this.updateQuickStats();
+    if (document.getElementById('tab-stats').classList.contains('active')) {
+      this.charts.update(demoEngine.getStats());
+    }
+    if (alert.confidence > 0.90) this.showAlarmPopup(alert);
+    this.showNotification(alert);
+  }
+
+  showAlarmPopup(alert) {
+    const popup = document.getElementById('alarmPopup');
+    popup.dataset.alertId = alert.id;
+    document.getElementById('alarmIcon').textContent = alert.icon;
+    document.getElementById('alarmTitle').textContent = `${alert.threatLabel.toUpperCase()} TESPİT EDİLDİ`;
+    document.getElementById('alarmDesc').innerHTML = `
+      <strong>${alert.nodeId}</strong> — ${alert.nodeName}<br/>
+      <span style="color:${alert.color};font-weight:700;font-size:18px;">${(alert.confidence*100).toFixed(1)}%</span> güvenle<br/>
+      <span style="font-family:monospace;font-size:11px;">${alert.latitude.toFixed(4)}, ${alert.longitude.toFixed(4)}</span>
+    `;
+    popup.classList.add('show');
+    clearTimeout(this._popupTimer);
+    this._popupTimer = setTimeout(() => popup.classList.remove('show'), 8000);
+  }
+
+  showNotification(alert) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`${alert.icon} ${alert.threatLabel}`, {
+          body: `${alert.nodeId} • ${(alert.confidence*100).toFixed(1)}% güven`,
+          tag: alert.id,
+        });
+      } catch(e) {}
+    }
+  }
+
+  renderAlerts() {
+    const list = document.getElementById('alertList');
+    const filterType = document.getElementById('alertFilter').value;
+    let filtered = this.alerts;
+    if (filterType !== 'all') filtered = filtered.filter(a => a.threatType === filterType);
+    if (this.searchQuery) {
+      filtered = filtered.filter(a =>
+        a.nodeId.toLowerCase().includes(this.searchQuery) ||
+        a.threatLabel.toLowerCase().includes(this.searchQuery) ||
+        a.nodeName.toLowerCase().includes(this.searchQuery)
+      );
+    }
+    if (filtered.length === 0) {
+      list.innerHTML = `<div style="text-align:center;color:#8b949e;padding:40px 20px;font-size:12px;">🔍 Alarm bulunamadı</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(a => this.buildAlertCard(a)).join('');
+    list.querySelectorAll('.alert-card').forEach(card => {
+      card.addEventListener('click', () => this.map.focusAlert(card.dataset.id));
+    });
+  }
+
+  buildAlertCard(a) {
+    const time = new Date(a.timestamp).toLocaleTimeString('tr-TR');
+    const date = new Date(a.timestamp).toLocaleDateString('tr-TR');
+    const badgeClass = a.severity === 'high' ? 'high' : a.severity === 'med' ? 'med' : '';
+    return `
+      <div class="alert-card ${a.threatType}" data-id="${a.id}">
+        <div class="alert-header">
+          <span class="alert-type">${a.icon} ${a.threatLabel}</span>
+          <span class="alert-badge ${badgeClass}">${(a.confidence*100).toFixed(0)}%</span>
+        </div>
+        <div class="alert-meta">
+          <span>📡 ${a.nodeId} • ${a.nodeName}</span>
+        </div>
+        <div class="alert-meta">
+          <span class="alert-coords">📍 ${a.latitude.toFixed(4)}, ${a.longitude.toFixed(4)}</span>
+          <span>🕐 ${time} • ${date}</span>
+        </div>
+        <div class="alert-meta">
+          <span>🔋 ${a.battery.toFixed(2)}V</span>
+          <span>📶 ${a.rssi} dBm</span>
+        </div>
+      </div>
+    `;
+  }
+
+  renderNodes() {
+    const list = document.getElementById('nodeList');
+    list.innerHTML = this.nodes.map(n => {
+      const statusClass = n.status === 'offline' ? 'offline' : n.status === 'lowbat' ? 'lowbat' : '';
+      const statusText = n.status === 'offline' ? 'Çevrimdışı' : n.status === 'lowbat' ? 'Düşük Pil' : 'Aktif';
+      const battPct = Math.min(100, Math.max(0, ((n.battery - 2.8) / (4.2 - 2.8)) * 100));
+      return `
+        <div class="node-card">
+          <div class="node-header">
+            <span class="node-id">📡 ${n.id}</span>
+            <span class="node-status ${statusClass}">${statusText}</span>
+          </div>
+          <div style="font-size:11px;color:#8b949e;margin-bottom:6px;">${n.name}</div>
+          <div class="node-info">
+            <span>Pil: <strong>${n.battery.toFixed(2)}V</strong></span>
+            <span>RSSI: <strong>${n.rssi} dBm</strong></span>
+            <span>Alarm: <strong>${n.alarmsToday}</strong></span>
+            <span>Konum: <strong>${n.lat.toFixed(2)},${n.lon.toFixed(2)}</strong></span>
+          </div>
+          <div class="battery-bar" style="margin-top:8px;">
+            <div class="battery-fill ${battPct < 20 ? 'low' : battPct < 50 ? 'med' : ''}" style="width:${battPct}%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderBatteryList() {
+    const list = document.getElementById('batteryList');
+    list.innerHTML = this.nodes.map(n => {
+      const pct = Math.min(100, Math.max(0, ((n.battery - 2.8) / (4.2 - 2.8)) * 100));
+      const cls = pct < 20 ? 'low' : pct < 50 ? 'med' : '';
+      return `
+        <div class="battery-item">
+          <span class="node-label">${n.id}</span>
+          <div class="battery-bar"><div class="battery-fill ${cls}" style="width:${pct}%"></div></div>
+          <span class="battery-pct">${pct.toFixed(0)}%</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  updateQuickStats() {
+    const stats = demoEngine.getStats();
+    const onlineNodes = this.nodes.filter(n => n.status === 'online').length;
+    document.getElementById('qsNodes').textContent = `${onlineNodes}/${this.nodes.length || 6}`;
+    document.getElementById('qsAlerts').textContent = stats.today;
+    document.getElementById('qsConf').textContent = `${(stats.avgConfidence * 100).toFixed(1)}%`;
+    const health = onlineNodes >= 5 ? 'ok' : onlineNodes >= 3 ? 'warn' : 'bad';
+    const healthText = onlineNodes >= 5 ? 'İyi' : onlineNodes >= 3 ? 'Orta' : 'Kritik';
+    const el = document.getElementById('qsHealth');
+    el.textContent = healthText;
+    el.className = `qs-value ${health}`;
+  }
+
+  startClock() {
+    const update = () => {
+      const now = new Date();
+      document.getElementById('clock').textContent =
+        now.toLocaleTimeString('tr-TR') + ' • ' + now.toLocaleDateString('tr-TR');
+    };
+    update();
+    setInterval(update, 1000);
+  }
+}
+
+// ============================================================
+// BAŞLAT
+// ============================================================
+const demoEngine = new DemoDataEngine();
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.app = new EcoAcousticApp();
+});
+</script>
+</body>
+</html>
