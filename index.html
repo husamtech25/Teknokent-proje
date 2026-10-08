@@ -5,13 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
 <meta name="theme-color" content="#000000" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>EcoAcoustic-AI — OGM Komuta Merkezi</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-/* ============================================================
-   RESET & DEĞİŞKENLER
-   ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 :root {
@@ -41,7 +37,6 @@
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
-  --radius-xl: 24px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
@@ -58,8 +53,6 @@ html, body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 body {
@@ -74,7 +67,230 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
 
 /* ============================================================
-   NAVBAR (Vercel Tarzı)
+   LOGIN SCREEN
+   ============================================================ */
+#loginScreen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #0a1f0a 0%, #000 70%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn .5s ease;
+}
+
+#loginScreen.hide { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(10,10,10,.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-3);
+  border-radius: 20px;
+  padding: 40px 32px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
+  animation: slideUp .6s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--info), var(--primary));
+  background-size: 200% 100%;
+  animation: gradientMove 3s linear infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-logo-icon {
+  font-size: 64px;
+  filter: drop-shadow(0 0 30px var(--primary-glow));
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -.5px;
+  background: linear-gradient(90deg, #fff, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-bottom: 32px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.form-input {
+  padding: 12px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all .2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.form-input::placeholder { color: var(--text-4); }
+
+.login-btn {
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px var(--primary-glow);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--primary-glow);
+}
+
+.login-btn:active { transform: translateY(0); }
+
+.login-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-error {
+  padding: 10px 14px;
+  background: var(--danger-glow);
+  border: 1px solid rgba(248,81,73,.3);
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+  display: none;
+  animation: shake .4s;
+}
+
+.login-error.show { display: block; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.login-demo {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.login-demo-title {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.demo-accounts {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.demo-account {
+  padding: 6px 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+
+.demo-account:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ============================================================
+   NAVBAR
    ============================================================ */
 .navbar {
   display: flex;
@@ -99,18 +315,11 @@ body {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -.3px;
-  flex-shrink: 0;
   cursor: pointer;
-  transition: opacity .2s;
+  flex-shrink: 0;
 }
 
-.nav-brand:hover { opacity: .8; }
-
-.nav-logo {
-  font-size: 22px;
-  filter: drop-shadow(0 0 8px var(--primary-glow));
-}
+.nav-logo { font-size: 22px; }
 
 .nav-links {
   display: flex;
@@ -127,33 +336,23 @@ body {
   color: var(--text-2);
   font-size: 13px;
   font-weight: 500;
-  text-decoration: none;
   border-radius: var(--radius-sm);
-  transition: all .15s ease;
-  position: relative;
+  transition: all .15s;
   white-space: nowrap;
   cursor: pointer;
   border: none;
   background: transparent;
   font-family: inherit;
+  position: relative;
 }
 
-.nav-link:hover {
-  color: var(--text);
-  background: var(--bg-3);
-}
-
-.nav-link.active {
-  color: var(--text);
-  background: var(--bg-4);
-}
-
+.nav-link:hover { color: var(--text); background: var(--bg-3); }
+.nav-link.active { color: var(--text); background: var(--bg-4); }
 .nav-link.active::after {
   content: '';
   position: absolute;
   bottom: -21px;
-  left: 12px;
-  right: 12px;
+  left: 12px; right: 12px;
   height: 2px;
   background: var(--text);
   border-radius: 1px;
@@ -178,26 +377,16 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 15px;
-  transition: all .15s ease;
+  transition: all .15s;
   position: relative;
 }
 
-.nav-icon-btn:hover {
-  background: var(--bg-3);
-  color: var(--text);
-  border-color: var(--border-3);
-}
-
-.nav-icon-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
+.nav-icon-btn:hover { background: var(--bg-3); color: var(--text); border-color: var(--border-3); }
+.nav-icon-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 .nav-icon-btn .badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -4px; right: -4px;
   background: var(--danger);
   color: white;
   font-size: 9px;
@@ -206,6 +395,13 @@ body {
   border-radius: 8px;
   min-width: 16px;
   text-align: center;
+}
+
+/* ============================================================
+   USER MENU
+   ============================================================ */
+.user-menu-wrapper {
+  position: relative;
 }
 
 .nav-user {
@@ -217,7 +413,9 @@ body {
   border: 1px solid var(--border-2);
   border-radius: 20px;
   cursor: pointer;
-  transition: all .15s ease;
+  transition: all .15s;
+  font-family: inherit;
+  color: var(--text);
 }
 
 .nav-user:hover { border-color: var(--border-3); }
@@ -226,23 +424,133 @@ body {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), #58a6ff);
+  background: linear-gradient(135deg, var(--primary), var(--info));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   color: white;
+  flex-shrink: 0;
 }
 
 .nav-user-name {
   font-size: 12px;
   font-weight: 600;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-3);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  overflow: hidden;
+  z-index: 1001;
+  display: none;
+  animation: dropdownIn .2s ease;
+}
+
+.user-dropdown.show { display: block; }
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.user-dropdown-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-dropdown-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--info));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-dropdown-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-dropdown-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-dropdown-role {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.user-dropdown-menu {
+  padding: 6px;
+}
+
+.user-dropdown-item {
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all .15s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-3);
   color: var(--text);
 }
 
+.user-dropdown-item.danger {
+  color: var(--danger);
+}
+
+.user-dropdown-item.danger:hover {
+  background: var(--danger-glow);
+}
+
+.user-dropdown-icon { font-size: 14px; }
+
+.user-dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
 /* ============================================================
-   ANA İÇERİK
+   MAIN
    ============================================================ */
 .main {
   padding: 32px calc(24px + var(--safe-right)) calc(32px + var(--safe-bottom)) calc(24px + var(--safe-left));
@@ -253,7 +561,18 @@ body {
 }
 
 /* ============================================================
-   KARŞILAMA
+   PAGES
+   ============================================================ */
+.page { display: none; }
+.page.active { display: block; animation: pageIn .3s ease; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   WELCOME
    ============================================================ */
 .welcome {
   margin-bottom: 32px;
@@ -274,7 +593,7 @@ body {
 }
 
 .welcome-title span {
-  background: linear-gradient(90deg, var(--primary), #58a6ff);
+  background: linear-gradient(90deg, var(--primary), var(--info));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -289,8 +608,7 @@ body {
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--primary);
   box-shadow: 0 0 12px var(--primary);
@@ -302,12 +620,12 @@ body {
 .status-dot.danger { background: var(--danger); box-shadow: 0 0 12px var(--danger); }
 
 @keyframes pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .6; transform: scale(.9); }
+  0%,100% { opacity: 1; }
+  50% { opacity: .5; }
 }
 
 .welcome-time {
-  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-family: 'SF Mono', monospace;
   font-size: 13px;
   color: var(--text-2);
   padding: 8px 14px;
@@ -318,7 +636,7 @@ body {
 }
 
 /* ============================================================
-   KPI KARTLARI
+   KPI
    ============================================================ */
 .kpi-grid {
   display: grid;
@@ -334,7 +652,7 @@ body {
   padding: 20px;
   position: relative;
   overflow: hidden;
-  transition: all .2s ease;
+  transition: all .2s;
   cursor: pointer;
 }
 
@@ -343,20 +661,6 @@ body {
   background: var(--bg-3);
   transform: translateY(-2px);
 }
-
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary), transparent);
-  opacity: 0;
-  transition: opacity .2s;
-}
-
-.kpi-card:hover::before { opacity: 1; }
 
 .kpi-header {
   display: flex;
@@ -407,25 +711,16 @@ body {
   color: var(--primary-2);
 }
 
-.kpi-change.down {
-  background: var(--danger-glow);
-  color: var(--danger);
-}
-
-.kpi-change.neutral {
-  background: var(--bg-4);
-  color: var(--text-3);
-}
+.kpi-change.down { background: var(--danger-glow); color: var(--danger); }
 
 /* ============================================================
-   ANA GRID
+   GRID & CARDS
    ============================================================ */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 16px;
   margin-bottom: 24px;
-  min-height: 0;
 }
 
 .card {
@@ -433,7 +728,6 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: border-color .2s;
 }
 
 .card:hover { border-color: var(--border-3); }
@@ -454,12 +748,9 @@ body {
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -.2px;
 }
 
-.card-title-icon {
-  font-size: 16px;
-}
+.card-title-icon { font-size: 16px; }
 
 .card-actions {
   display: flex;
@@ -480,28 +771,14 @@ body {
   font-family: inherit;
 }
 
-.chip:hover {
-  color: var(--text);
-  border-color: var(--border-3);
-}
-
-.chip.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.chip.live {
-  background: var(--primary-glow);
-  color: var(--primary-2);
-  border-color: rgba(46,160,67,.3);
-}
+.chip:hover { color: var(--text); border-color: var(--border-3); }
+.chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+.chip.live { background: var(--primary-glow); color: var(--primary-2); border-color: rgba(46,160,67,.3); }
 
 .chip.live::before {
   content: '';
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--primary);
   margin-right: 6px;
@@ -518,17 +795,9 @@ body {
   background: #0a0a0a;
 }
 
-#map {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
+#map { width: 100%; height: 100%; z-index: 1; }
 
-.leaflet-container {
-  background: #0a0a0a;
-  font-family: inherit;
-}
-
+.leaflet-container { background: #0a0a0a; font-family: inherit; }
 .leaflet-popup-content-wrapper {
   background: var(--bg-3);
   color: var(--text);
@@ -537,25 +806,12 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,.5);
   padding: 0;
 }
-
-.leaflet-popup-content {
-  margin: 0;
-  font-size: 12px;
-}
-
-.leaflet-popup-tip {
-  background: var(--bg-3);
-  border: 1px solid var(--border-3);
-}
-
+.leaflet-popup-content { margin: 0; font-size: 12px; }
+.leaflet-popup-tip { background: var(--bg-3); border: 1px solid var(--border-3); }
 .leaflet-popup-close-button {
   color: var(--text-2) !important;
   font-size: 20px !important;
   padding: 8px 12px 0 0 !important;
-}
-
-.leaflet-popup-close-button:hover {
-  color: var(--text) !important;
 }
 
 .leaflet-control-zoom {
@@ -574,16 +830,10 @@ body {
   height: 36px !important;
   line-height: 36px !important;
   font-size: 18px !important;
-  transition: background .15s;
 }
 
-.leaflet-control-zoom a:hover {
-  background: var(--bg-4) !important;
-}
-
-.leaflet-control-zoom a:last-child {
-  border-bottom: none !important;
-}
+.leaflet-control-zoom a:hover { background: var(--bg-4) !important; }
+.leaflet-control-zoom a:last-child { border-bottom: none !important; }
 
 .leaflet-control-attribution {
   background: rgba(0,0,0,.7) !important;
@@ -594,11 +844,6 @@ body {
   margin: 8px !important;
 }
 
-.leaflet-control-attribution a {
-  color: var(--text-3) !important;
-}
-
-/* Harita üstü floating kontroller */
 .map-overlay-top {
   position: absolute;
   top: 16px;
@@ -611,17 +856,14 @@ body {
   pointer-events: none;
 }
 
-.map-overlay-top > * {
-  pointer-events: all;
-}
+.map-overlay-top > * { pointer-events: all; }
 
-.map-filters {
+.map-filters, .map-layers {
   display: flex;
   gap: 4px;
   padding: 4px;
   background: rgba(10,10,10,.85);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-3);
   border-radius: var(--radius);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
@@ -642,23 +884,7 @@ body {
 }
 
 .map-filter-btn:hover { color: var(--text); background: rgba(255,255,255,.05); }
-.map-filter-btn.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 0 12px var(--primary-glow);
-}
-
-.map-layers {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: rgba(10,10,10,.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-3);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 24px rgba(0,0,0,.4);
-}
+.map-filter-btn.active { background: var(--primary); color: white; }
 
 .map-layer-btn {
   width: 32px;
@@ -669,19 +895,14 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: all .15s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .map-layer-btn:hover { color: var(--text); background: rgba(255,255,255,.05); }
-.map-layer-btn.active {
-  background: var(--primary);
-  color: white;
-}
+.map-layer-btn.active { background: var(--primary); color: white; }
 
-/* Harita altı legend */
 .map-overlay-bottom {
   position: absolute;
   bottom: 16px;
@@ -693,10 +914,8 @@ body {
   padding: 12px 14px;
   background: rgba(10,10,10,.85);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-3);
   border-radius: var(--radius);
-  box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
 
 .map-legend-title {
@@ -717,18 +936,15 @@ body {
   margin-bottom: 4px;
 }
 
-.map-legend-item:last-child { margin-bottom: 0; }
-
 .map-legend-dot {
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   box-shadow: 0 0 8px currentColor;
   flex-shrink: 0;
 }
 
 /* ============================================================
-   AKTİVİTE FEED (Sağ Panel)
+   AKTİVİTE
    ============================================================ */
 .activity-feed {
   max-height: 520px;
@@ -769,16 +985,6 @@ body {
   flex-shrink: 0;
   background: var(--bg-4);
   border: 1px solid var(--border-2);
-  position: relative;
-}
-
-.activity-icon::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  border: 1px solid currentColor;
-  opacity: .3;
 }
 
 .activity-icon.chainsaw { color: var(--chainsaw); background: rgba(240,180,41,.08); }
@@ -786,10 +992,7 @@ body {
 .activity-icon.gunshot { color: var(--gunshot); background: rgba(229,72,77,.08); }
 .activity-icon.tamper { color: var(--tamper); background: rgba(163,113,247,.08); }
 
-.activity-content {
-  flex: 1;
-  min-width: 0;
-}
+.activity-content { flex: 1; min-width: 0; }
 
 .activity-title {
   font-size: 12px;
@@ -798,7 +1001,6 @@ body {
   margin-bottom: 2px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 8px;
 }
 
@@ -812,15 +1014,8 @@ body {
   flex-shrink: 0;
 }
 
-.activity-badge.high {
-  background: var(--danger-glow);
-  color: var(--danger);
-}
-
-.activity-badge.med {
-  background: rgba(210,153,34,.15);
-  color: var(--warning);
-}
+.activity-badge.high { background: var(--danger-glow); color: var(--danger); }
+.activity-badge.med { background: rgba(210,153,34,.15); color: var(--warning); }
 
 .activity-meta {
   font-size: 10px;
@@ -830,14 +1025,8 @@ body {
   flex-wrap: wrap;
 }
 
-.activity-meta span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 /* ============================================================
-   ALT GRID (Grafikler)
+   BOTTOM GRID
    ============================================================ */
 .bottom-grid {
   display: grid;
@@ -853,7 +1042,7 @@ body {
 }
 
 /* ============================================================
-   DÜĞÜMLER
+   NODES
    ============================================================ */
 .nodes-grid {
   display: grid;
@@ -882,9 +1071,7 @@ body {
 .node-tile::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
+  top: 0; left: 0; bottom: 0;
   width: 3px;
   background: var(--primary);
 }
@@ -900,10 +1087,9 @@ body {
 }
 
 .node-tile-id {
-  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-family: 'SF Mono', monospace;
   font-size: 12px;
   font-weight: 700;
-  color: var(--text);
 }
 
 .node-tile-status {
@@ -914,7 +1100,6 @@ body {
   background: var(--primary-glow);
   color: var(--primary-2);
   text-transform: uppercase;
-  letter-spacing: .3px;
 }
 
 .node-tile-status.warning { background: rgba(210,153,34,.15); color: var(--warning); }
@@ -933,25 +1118,19 @@ body {
   margin-bottom: 10px;
 }
 
-.node-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.node-stat { display: flex; flex-direction: column; gap: 2px; }
 
 .node-stat-label {
   font-size: 9px;
   color: var(--text-4);
   text-transform: uppercase;
-  letter-spacing: .4px;
   font-weight: 700;
 }
 
 .node-stat-value {
   font-size: 12px;
   font-weight: 700;
-  color: var(--text);
-  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-family: 'SF Mono', monospace;
 }
 
 .node-battery-bar {
@@ -964,171 +1143,11 @@ body {
 .node-battery-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary), var(--primary-2));
-  border-radius: 2px;
-  transition: width .4s ease;
+  transition: width .4s;
 }
 
 .node-battery-fill.warning { background: linear-gradient(90deg, var(--warning), #f0b429); }
 .node-battery-fill.danger { background: linear-gradient(90deg, var(--danger), #ff7b72); }
-
-/* ============================================================
-   TIMELINE
-   ============================================================ */
-.timeline-container {
-  padding: 20px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.timeline-list {
-  position: relative;
-  padding-left: 24px;
-}
-
-.timeline-list::before {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
-  background: var(--border-2);
-}
-
-.timeline-entry {
-  position: relative;
-  padding: 10px 0 10px 16px;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: background .15s;
-}
-
-.timeline-entry:hover { background: var(--bg-3); }
-
-.timeline-entry::before {
-  content: '';
-  position: absolute;
-  left: -21px;
-  top: 14px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--bg-2);
-  border: 2px solid var(--primary);
-  box-shadow: 0 0 0 3px var(--bg-2);
-}
-
-.timeline-entry.chainsaw::before { border-color: var(--chainsaw); }
-.timeline-entry.fire::before { border-color: var(--fire); }
-.timeline-entry.gunshot::before { border-color: var(--gunshot); }
-.timeline-entry.tamper::before { border-color: var(--tamper); }
-
-.timeline-time {
-  font-size: 10px;
-  color: var(--text-4);
-  font-family: 'SF Mono', 'JetBrains Mono', monospace;
-  font-weight: 600;
-  margin-bottom: 3px;
-}
-
-.timeline-text {
-  font-size: 12px;
-  color: var(--text);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.timeline-text strong { font-weight: 700; }
-
-/* ============================================================
-   BOŞ DURUM
-   ============================================================ */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  opacity: .3;
-  margin-bottom: 16px;
-}
-
-.empty-state-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 4px;
-}
-
-.empty-state-desc {
-  font-size: 12px;
-  color: var(--text-4);
-}
-
-/* ============================================================
-   MARKER'LAR
-   ============================================================ */
-.custom-marker {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 0 20px currentColor, 0 3px 8px rgba(0,0,0,.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  animation: markerPulse 2s infinite;
-  cursor: pointer;
-}
-
-@keyframes markerPulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.marker-chainsaw { background: var(--chainsaw); color: var(--chainsaw); }
-.marker-fire { background: var(--fire); color: var(--fire); }
-.marker-gunshot { background: var(--gunshot); color: var(--gunshot); }
-.marker-tamper { background: var(--tamper); color: var(--tamper); }
-
-.node-marker {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 3px solid white;
-  box-shadow: 0 0 15px var(--primary), 0 0 4px rgba(0,0,0,.5);
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.node-marker:hover {
-  transform: scale(1.4);
-  box-shadow: 0 0 25px var(--primary);
-}
-
-.node-marker.offline { background: var(--danger); box-shadow: 0 0 15px var(--danger); }
-.node-marker.lowbat { background: var(--warning); box-shadow: 0 0 15px var(--warning); }
-
-.pulse-ring {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid;
-  animation: ringPulse 1.8s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes ringPulse {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(3.5); opacity: 0; }
-}
 
 /* ============================================================
    MODAL
@@ -1138,7 +1157,6 @@ body {
   inset: 0;
   background: rgba(0,0,0,.8);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -1146,15 +1164,7 @@ body {
   padding: 20px;
 }
 
-.modal-backdrop.show {
-  display: flex;
-  animation: fadeIn .2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+.modal-backdrop.show { display: flex; animation: fadeIn .2s; }
 
 .modal {
   background: var(--bg-2);
@@ -1195,16 +1205,12 @@ body {
   flex-shrink: 0;
 }
 
-.modal-title-wrap {
-  flex: 1;
-  min-width: 0;
-}
+.modal-title-wrap { flex: 1; min-width: 0; }
 
 .modal-title {
   font-size: 16px;
   font-weight: 800;
   color: var(--text);
-  letter-spacing: -.3px;
   margin-bottom: 2px;
 }
 
@@ -1229,20 +1235,10 @@ body {
   flex-shrink: 0;
 }
 
-.modal-close:hover {
-  background: var(--danger);
-  color: white;
-  border-color: var(--danger);
-}
+.modal-close:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-.modal-body {
-  padding: 20px 24px;
-}
-
-.modal-section {
-  margin-bottom: 20px;
-}
-
+.modal-body { padding: 20px 24px; }
+.modal-section { margin-bottom: 20px; }
 .modal-section:last-child { margin-bottom: 0; }
 
 .modal-section-title {
@@ -1271,7 +1267,6 @@ body {
   font-size: 9px;
   color: var(--text-4);
   text-transform: uppercase;
-  letter-spacing: .4px;
   margin-bottom: 4px;
   font-weight: 700;
 }
@@ -1279,8 +1274,7 @@ body {
 .modal-grid-value {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text);
-  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-family: 'SF Mono', monospace;
 }
 
 .confidence-bar {
@@ -1288,14 +1282,13 @@ body {
   background: var(--bg-4);
   border-radius: 5px;
   overflow: hidden;
-  position: relative;
 }
 
 .confidence-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary), var(--primary-2));
   border-radius: 5px;
-  transition: width .5s ease;
+  transition: width .5s;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1305,9 +1298,7 @@ body {
   color: white;
 }
 
-.confidence-fill.high {
-  background: linear-gradient(90deg, var(--danger), #ff7b72);
-}
+.confidence-fill.high { background: linear-gradient(90deg, var(--danger), #ff7b72); }
 
 .modal-actions {
   display: flex;
@@ -1333,26 +1324,235 @@ body {
   gap: 6px;
 }
 
-.btn:hover {
-  background: var(--bg-4);
-  border-color: var(--border-3);
+.btn:hover { background: var(--bg-4); border-color: var(--border-3); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
+.btn.primary:hover { background: var(--primary-2); }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: white; }
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.btn.primary {
+.settings-section {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.settings-section-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-section-desc {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.settings-list {
+  padding: 8px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  transition: all .15s;
+}
+
+.settings-item:hover { background: var(--bg-3); }
+
+.settings-item-info { flex: 1; min-width: 0; }
+
+.settings-item-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.settings-item-desc {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* Toggle Switch */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-5);
+  border-radius: 24px;
+  transition: all .3s;
+  border: 1px solid var(--border-2);
+}
+
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: var(--text-2);
+  border-radius: 50%;
+  transition: all .3s;
+}
+
+.toggle input:checked + .toggle-slider {
   background: var(--primary);
   border-color: var(--primary);
-  color: white;
 }
 
-.btn.primary:hover {
-  background: var(--primary-2);
+.toggle input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+  background: white;
 }
 
-.btn.danger {
-  background: var(--danger);
-  border-color: var(--danger);
-  color: white;
+/* Select */
+.settings-select {
+  padding: 8px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 140px;
 }
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Range */
+.settings-range {
+  width: 180px;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--bg-5);
+  border-radius: 2px;
+  outline: none;
+}
+
+.settings-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.settings-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Theme Grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.theme-option {
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  border: 2px solid var(--border-2);
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+}
+
+.theme-option:hover { border-color: var(--border-3); transform: scale(1.05); }
+.theme-option.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+.theme-preview {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+}
+
+.theme-preview-dot {
+  flex: 1;
+  border-radius: 3px;
+}
+
+.theme-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+/* Danger button */
+.btn-danger-outline {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+
+.btn-danger-outline:hover { background: var(--danger); color: white; }
 
 /* ============================================================
    TOAST
@@ -1395,31 +1595,77 @@ body {
 }
 
 .toast-icon { font-size: 18px; flex-shrink: 0; }
-.toast-text { font-size: 12px; color: var(--text); font-weight: 600; line-height: 1.4; }
+.toast-text { font-size: 12px; color: var(--text); font-weight: 600; }
 
 /* ============================================================
-   RESPONSIVE — TABLET
+   MARKER
    ============================================================ */
-@media (max-width: 1200px) {
-  .main-grid { grid-template-columns: 1fr 340px; }
-  .bottom-grid { grid-template-columns: 1fr 1fr; }
+.custom-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 20px currentColor, 0 3px 8px rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  animation: markerPulse 2s infinite;
+  cursor: pointer;
 }
 
+@keyframes markerPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.marker-chainsaw { background: var(--chainsaw); color: var(--chainsaw); }
+.marker-fire { background: var(--fire); color: var(--fire); }
+.marker-gunshot { background: var(--gunshot); color: var(--gunshot); }
+.marker-tamper { background: var(--tamper); color: var(--tamper); }
+
+.node-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid white;
+  box-shadow: 0 0 15px var(--primary);
+  cursor: pointer;
+}
+
+.node-marker.offline { background: var(--danger); }
+.node-marker.lowbat { background: var(--warning); }
+
+.pulse-ring {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid;
+  animation: ringPulse 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ringPulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .main-grid { grid-template-columns: 1fr; }
   .map-container { height: 400px; }
   .bottom-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ============================================================
-   RESPONSIVE — MOBİL
-   ============================================================ */
 @media (max-width: 768px) {
   .navbar {
     padding: 0 calc(16px + var(--safe-right)) 0 calc(16px + var(--safe-left));
-    padding-top: var(--safe-top);
     height: calc(56px + var(--safe-top));
     gap: 12px;
   }
@@ -1427,96 +1673,90 @@ body {
   .nav-brand { font-size: 14px; }
   .nav-logo { font-size: 20px; }
   .nav-user-name { display: none; }
-  .nav-icon-btn { width: 34px; height: 34px; }
 
   .main {
     padding: 20px calc(16px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(16px + var(--safe-left));
   }
 
-  .welcome {
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
   .welcome-title { font-size: 22px; }
-  .welcome-time { font-size: 11px; padding: 6px 10px; }
+  .welcome-time { font-size: 11px; }
 
-  .kpi-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
+  .kpi-grid { gap: 10px; }
   .kpi-card { padding: 14px; }
   .kpi-value { font-size: 24px; }
-  .kpi-label { font-size: 10px; }
-  .kpi-icon { width: 28px; height: 28px; font-size: 14px; }
-
-  .card-header { padding: 12px 16px; }
-  .card-title { font-size: 12px; }
 
   .map-container { height: 320px; }
-
-  .map-filters {
-    padding: 3px;
-    overflow-x: auto;
-    max-width: calc(100vw - 100px);
-    scrollbar-width: none;
-  }
-
-  .map-filters::-webkit-scrollbar { display: none; }
-
-  .map-filter-btn { padding: 5px 9px; font-size: 10px; }
-  .map-layer-btn { width: 28px; height: 28px; font-size: 12px; }
-
+  .map-filters { overflow-x: auto; max-width: calc(100vw - 100px); }
   .map-legend { display: none; }
 
-  .nodes-grid { grid-template-columns: 1fr; padding: 12px; gap: 10px; }
-
+  .nodes-grid { grid-template-columns: 1fr; padding: 12px; }
   .chart-container { height: 200px; padding: 16px; }
 
-  .timeline-container { padding: 16px; }
-
   .modal-backdrop { padding: 0; align-items: flex-end; }
-  .modal {
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    max-height: 90vh;
-    max-height: 90dvh;
-  }
-
+  .modal { border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 90vh; }
   .modal-grid { grid-template-columns: 1fr; }
 
-  .toast-container {
-    top: calc(64px + var(--safe-top));
-    left: 16px;
-    right: 16px;
-    max-width: 100%;
-  }
-}
+  .toast-container { top: calc(64px + var(--safe-top)); left: 16px; right: 16px; max-width: 100%; }
 
-/* ============================================================
-   MODAL DETAY
-   ============================================================ */
-.modal-backdrop.show {
-  padding-bottom: var(--safe-bottom);
-}
+  .login-container { padding: 32px 24px; }
+  .login-logo-icon { font-size: 56px; }
+  .login-title { font-size: 22px; }
 
-@media (max-width: 480px) {
-  .welcome-title { font-size: 20px; }
-  .kpi-value { font-size: 22px; }
-  .kpi-card { padding: 12px; }
-  .kpi-change { font-size: 10px; }
+  .theme-grid { grid-template-columns: 1fr 1fr; }
+  .settings-range { width: 100px; }
+  .settings-select { min-width: 100px; font-size: 11px; }
 }
 </style>
 </head>
 <body>
 
 <!-- ============================================================
+     LOGIN SCREEN
+     ============================================================ -->
+<div id="loginScreen">
+  <div class="login-container">
+    <div class="login-logo">
+      <div class="login-logo-icon">🌲</div>
+    </div>
+    <h1 class="login-title">EcoAcoustic-AI</h1>
+    <p class="login-subtitle">OGM Komuta Merkezi — Güvenli Giriş</p>
+
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Kullanıcı Adı</label>
+        <input type="text" class="form-input" id="loginUsername" placeholder="operatör" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Şifre</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span>🔓</span>
+        <span>Giriş Yap</span>
+      </button>
+    </form>
+
+    <div class="login-demo">
+      <div class="login-demo-title">Demo Hesaplar</div>
+      <div class="demo-accounts">
+        <button class="demo-account" data-user="admin">👑 Admin</button>
+        <button class="demo-account" data-user="operator">🎯 Operatör</button>
+        <button class="demo-account" data-user="field">🚒 Saha</button>
+        <button class="demo-account" data-user="viewer">👁️ İzleyici</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      NAVBAR
      ============================================================ -->
-<nav class="navbar">
-  <div class="nav-brand" onclick="location.reload()">
+<nav class="navbar" id="navbar" style="display:none;">
+  <div class="nav-brand" onclick="app.goToPage('dashboard')">
     <span class="nav-logo">🌲</span>
     <span>EcoAcoustic</span>
   </div>
@@ -1530,211 +1770,600 @@ body {
   </div>
 
   <div class="nav-actions">
-    <button class="nav-icon-btn" id="soundBtn" title="Ses">
-      <span id="soundIcon">🔔</span>
-    </button>
-    <button class="nav-icon-btn" id="exportBtn" title="İndir">
-      📥
-    </button>
+    <button class="nav-icon-btn" id="soundBtn" title="Ses"><span id="soundIcon">🔔</span></button>
+    <button class="nav-icon-btn" id="exportBtn" title="İndir">📥</button>
     <button class="nav-icon-btn" id="alertsBtn" title="Alarmlar">
       🚨
       <span class="badge" id="navBadge" style="display:none;">0</span>
     </button>
-    <div class="nav-user">
-      <div class="nav-user-avatar">OG</div>
-      <span class="nav-user-name">Operatör</span>
+
+    <div class="user-menu-wrapper">
+      <button class="nav-user" id="userBtn">
+        <div class="nav-user-avatar" id="userAvatar">OG</div>
+        <span class="nav-user-name" id="userName">Operatör</span>
+      </button>
+
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-avatar" id="dropdownAvatar">OG</div>
+          <div class="user-dropdown-info">
+            <div class="user-dropdown-name" id="dropdownName">Operatör</div>
+            <div class="user-dropdown-role" id="dropdownRole">Operator</div>
+          </div>
+        </div>
+        <div class="user-dropdown-menu">
+          <button class="user-dropdown-item" data-action="profile">
+            <span class="user-dropdown-icon">👤</span>
+            <span>Profilim</span>
+          </button>
+          <button class="user-dropdown-item" data-action="settings">
+            <span class="user-dropdown-icon">⚙️</span>
+            <span>Ayarlar</span>
+          </button>
+          <button class="user-dropdown-item" data-action="help">
+            <span class="user-dropdown-icon">❓</span>
+            <span>Yardım</span>
+          </button>
+          <div class="user-dropdown-divider"></div>
+          <button class="user-dropdown-item danger" data-action="logout">
+            <span class="user-dropdown-icon">🚪</span>
+            <span>Çıkış Yap</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
 
 <!-- ============================================================
-     ANA İÇERİK
+     MAIN
      ============================================================ -->
-<main class="main">
+<main class="main" id="main" style="display:none;">
 
-  <!-- Karşılama -->
-  <div class="welcome">
-    <div>
-      <h1 class="welcome-title">
-        Hoş geldin, <span>Operatör</span> 👋
-      </h1>
-      <div class="welcome-status">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">Tüm sistemler çalışıyor</span>
+  <!-- ============ PAGE: DASHBOARD ============ -->
+  <div class="page active" id="page-dashboard">
+    <div class="welcome">
+      <div>
+        <h1 class="welcome-title">Hoş geldin, <span id="welcomeUser">Operatör</span> 👋</h1>
+        <div class="welcome-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Tüm sistemler çalışıyor</span>
+        </div>
       </div>
-    </div>
-    <div class="welcome-time" id="clock">--:--:--</div>
-  </div>
-
-  <!-- KPI Kartları -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <span class="kpi-label">Aktif Düğüm</span>
-        <div class="kpi-icon">📡</div>
-      </div>
-      <div class="kpi-value" id="kpiNodes">0/8</div>
-      <span class="kpi-change" id="kpiNodesChange">▲ Tümü çalışıyor</span>
+      <div class="welcome-time" id="clock">--:--:--</div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <span class="kpi-label">Bugünkü Alarm</span>
-        <div class="kpi-icon">🚨</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Aktif Düğüm</span>
+          <div class="kpi-icon">📡</div>
+        </div>
+        <div class="kpi-value" id="kpiNodes">0/8</div>
+        <span class="kpi-change">▲ Tümü çalışıyor</span>
       </div>
-      <div class="kpi-value" id="kpiAlerts">0</div>
-      <span class="kpi-change" id="kpiAlertsChange">▲ Son 1 saat</span>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Bugünkü Alarm</span>
+          <div class="kpi-icon">🚨</div>
+        </div>
+        <div class="kpi-value" id="kpiAlerts">0</div>
+        <span class="kpi-change">▲ Son 1 saat</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Ortalama Doğruluk</span>
+          <div class="kpi-icon">🎯</div>
+        </div>
+        <div class="kpi-value" id="kpiConf">0%</div>
+        <span class="kpi-change">▲ Stabil</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Sistem Gecikmesi</span>
+          <div class="kpi-icon">⚡</div>
+        </div>
+        <div class="kpi-value" id="kpiLatency">1.2s</div>
+        <span class="kpi-change down">▼ İyileşme</span>
+      </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <span class="kpi-label">Ortalama Doğruluk</span>
-        <div class="kpi-icon">🎯</div>
+    <div class="main-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">🗺️</span>
+            <span>Canlı Tehdit Haritası</span>
+            <span class="chip live">Erzurum</span>
+          </div>
+          <div class="card-actions">
+            <span class="chip" id="alertCountChip">0 alarm</span>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div id="map"></div>
+          <div class="map-overlay-top">
+            <div class="map-filters">
+              <button class="map-filter-btn active" data-filter="all">Tümü</button>
+              <button class="map-filter-btn" data-filter="chainsaw">🪚</button>
+              <button class="map-filter-btn" data-filter="fire">🔥</button>
+              <button class="map-filter-btn" data-filter="gunshot">🔫</button>
+              <button class="map-filter-btn" data-filter="tamper">⚠️</button>
+            </div>
+            <div class="map-layers">
+              <button class="map-layer-btn active" data-layer="satellite" title="Uydu">🛰️</button>
+              <button class="map-layer-btn" data-layer="terrain" title="Topoğrafya">🏔️</button>
+              <button class="map-layer-btn" data-layer="streets" title="Sokak">🗺️</button>
+              <button class="map-layer-btn" data-layer="heat" title="Isı">🔥</button>
+            </div>
+          </div>
+          <div class="map-overlay-bottom">
+            <div class="map-legend">
+              <div class="map-legend-title">Gösterge</div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#2ea043;color:#2ea043;"></div>
+                <span>Aktif Düğüm</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#f0b429;color:#f0b429;"></div>
+                <span>Testere</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#ff6b35;color:#ff6b35;"></div>
+                <span>Yangın</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#e5484d;color:#e5484d;"></div>
+                <span>Silah</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#a371f7;color:#a371f7;"></div>
+                <span>Kurcalama</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="kpi-value" id="kpiConf">0%</div>
-      <span class="kpi-change" id="kpiConfChange">▲ Stabil</span>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">⚡</span>
+            <span>Aktivite</span>
+          </div>
+          <div class="card-actions">
+            <span class="chip live">Canlı</span>
+          </div>
+        </div>
+        <div class="activity-feed" id="activityFeed"></div>
+      </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <span class="kpi-label">Sistem Gecikmesi</span>
-        <div class="kpi-icon">⚡</div>
+    <div class="bottom-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">📈</span>
+            <span>Tehdit Dağılımı</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="threatChart"></canvas>
+        </div>
       </div>
-      <div class="kpi-value" id="kpiLatency">1.2s</div>
-      <span class="kpi-change down" id="kpiLatencyChange">▼ İyileşme</span>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">📊</span>
+            <span>Saatlik</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-icon">🔋</span>
+            <span>Pil Durumu</span>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 240px; padding: 16px;">
+          <div id="batteryList"></div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Ana Grid: Harita + Aktivite -->
-  <div class="main-grid">
-
-    <!-- Harita Card -->
-    <div class="card">
+    <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
         <div class="card-title">
-          <span class="card-title-icon">🗺️</span>
-          <span>Canlı Tehdit Haritası</span>
-          <span class="chip live">Erzurum</span>
-        </div>
-        <div class="card-actions">
-          <span class="chip" id="alertCountChip">0 alarm</span>
+          <span class="card-title-icon">📡</span>
+          <span>Aktif Düğümler</span>
+          <span class="chip" id="nodeCountChip">8 düğüm</span>
         </div>
       </div>
-
-      <div class="map-container">
-        <div id="map"></div>
-
-        <!-- Üst Floating Kontroller -->
-        <div class="map-overlay-top">
-          <div class="map-filters">
-            <button class="map-filter-btn active" data-filter="all">Tümü</button>
-            <button class="map-filter-btn" data-filter="chainsaw">🪚</button>
-            <button class="map-filter-btn" data-filter="fire">🔥</button>
-            <button class="map-filter-btn" data-filter="gunshot">🔫</button>
-            <button class="map-filter-btn" data-filter="tamper">⚠️</button>
-          </div>
-
-          <div class="map-layers">
-            <button class="map-layer-btn active" data-layer="satellite" title="Uydu">🛰️</button>
-            <button class="map-layer-btn" data-layer="terrain" title="Topoğrafya">🏔️</button>
-            <button class="map-layer-btn" data-layer="streets" title="Sokak">🗺️</button>
-            <button class="map-layer-btn" data-layer="heat" title="Isı Haritası">🔥</button>
-          </div>
-        </div>
-
-        <!-- Alt Legend -->
-        <div class="map-overlay-bottom">
-          <div class="map-legend">
-            <div class="map-legend-title">Gösterge</div>
-            <div class="map-legend-item">
-              <div class="map-legend-dot" style="background:#2ea043;color:#2ea043;"></div>
-              <span>Aktif Düğüm</span>
-            </div>
-            <div class="map-legend-item">
-              <div class="map-legend-dot" style="background:#f0b429;color:#f0b429;"></div>
-              <span>Testere</span>
-            </div>
-            <div class="map-legend-item">
-              <div class="map-legend-dot" style="background:#ff6b35;color:#ff6b35;"></div>
-              <span>Yangın</span>
-            </div>
-            <div class="map-legend-item">
-              <div class="map-legend-dot" style="background:#e5484d;color:#e5484d;"></div>
-              <span>Silah</span>
-            </div>
-            <div class="map-legend-item">
-              <div class="map-legend-dot" style="background:#a371f7;color:#a371f7;"></div>
-              <span>Kurcalama</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Aktivite Feed -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">⚡</span>
-          <span>Aktivite</span>
-        </div>
-        <div class="card-actions">
-          <span class="chip live">Canlı</span>
-        </div>
-      </div>
-      <div class="activity-feed" id="activityFeed"></div>
+      <div class="nodes-grid" id="nodesGrid"></div>
     </div>
   </div>
 
-  <!-- Alt Grid: Grafikler -->
-  <div class="bottom-grid">
+  <!-- ============ PAGE: ALERTS ============ -->
+  <div class="page" id="page-alerts">
+    <div class="welcome">
+      <div>
+        <h1 class="welcome-title">🚨 <span>Alarmlar</span></h1>
+        <div class="welcome-status">
+          <span class="status-dot"></span>
+          <span id="alertsCountText">0 alarm kayıtlı</span>
+        </div>
+      </div>
+      <div class="welcome-time" id="alertsClock">--:--:--</div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+      <div class="card-header" style="gap: 8px; flex-wrap: wrap;">
+        <div class="card-actions" style="flex: 1; gap: 8px; flex-wrap: wrap;">
+          <input type="text" id="alertSearch" placeholder="🔍 Ara..." class="form-input" style="flex: 1; min-width: 200px;" />
+          <select id="alertFilter" class="settings-select">
+            <option value="all">Tüm tehditler</option>
+            <option value="chainsaw">🪚 Testere</option>
+            <option value="fire">🔥 Yangın</option>
+            <option value="gunshot">🔫 Silah</option>
+            <option value="tamper">⚠️ Kurcalama</option>
+          </select>
+          <select id="nodeFilter" class="settings-select">
+            <option value="all">Tüm düğümler</option>
+          </select>
+        </div>
+      </div>
+      <div id="alertsListFull" style="padding: 8px;"></div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE: NODES ============ -->
+  <div class="page" id="page-nodes">
+    <div class="welcome">
+      <div>
+        <h1 class="welcome-title">📡 <span>Düğümler</span></h1>
+        <div class="welcome-status">
+          <span class="status-dot"></span>
+          <span id="nodesStatusText">8 düğüm aktif</span>
+        </div>
+      </div>
+      <div class="welcome-time" id="nodesClock">--:--:--</div>
+    </div>
+
+    <div class="card">
+      <div class="nodes-grid" id="nodesGridFull"></div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE: ANALYTICS ============ -->
+  <div class="page" id="page-analytics">
+    <div class="welcome">
+      <div>
+        <h1 class="welcome-title">📊 <span>Analitik</span></h1>
+        <div class="welcome-status">
+          <span class="status-dot"></span>
+          <span>Sistem istatistikleri</span>
+        </div>
+      </div>
+      <div class="welcome-time" id="analyticsClock">--:--:--</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Toplam Alarm</span>
+          <div class="kpi-icon">📈</div>
+        </div>
+        <div class="kpi-value" id="analyticsTotal">0</div>
+        <span class="kpi-change">Tüm zamanlar</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Bugün</span>
+          <div class="kpi-icon">📅</div>
+        </div>
+        <div class="kpi-value" id="analyticsToday">0</div>
+        <span class="kpi-change">Son 24 saat</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">En Çok Tehdit</span>
+          <div class="kpi-icon">🎯</div>
+        </div>
+        <div class="kpi-value" id="analyticsTop" style="font-size: 20px;">—</div>
+        <span class="kpi-change">Son 7 gün</span>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Ortalama Güven</span>
+          <div class="kpi-icon">✅</div>
+        </div>
+        <div class="kpi-value" id="analyticsAvg">0%</div>
+        <span class="kpi-change">Tüm alarmlar</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-icon">📊</span>
+          <span>Tehdit Tipine Göre Dağılım</span>
+        </div>
+      </div>
+      <div class="chart-container" style="height: 300px;">
+        <canvas id="analyticsChart1"></canvas>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-header">
         <div class="card-title">
           <span class="card-title-icon">📈</span>
-          <span>Tehdit Dağılımı</span>
+          <span>Saatlik Yoğunluk</span>
         </div>
       </div>
-      <div class="chart-container">
-        <canvas id="threatChart"></canvas>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">📊</span>
-          <span>Saatlik</span>
-        </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="hourlyChart"></canvas>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">🔋</span>
-          <span>Pil Durumu</span>
-        </div>
-      </div>
-      <div class="chart-container" style="height: 240px; padding: 16px;">
-        <div id="batteryList"></div>
+      <div class="chart-container" style="height: 300px;">
+        <canvas id="analyticsChart2"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Düğümler -->
-  <div class="card" style="margin-bottom: 24px;">
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-title-icon">📡</span>
-        <span>Aktif Düğümler</span>
-        <span class="chip" id="nodeCountChip">8 düğüm</span>
+  <!-- ============ PAGE: SETTINGS ============ -->
+  <div class="page" id="page-settings">
+    <div class="welcome">
+      <div>
+        <h1 class="welcome-title">⚙️ <span>Ayarlar</span></h1>
+        <div class="welcome-status">
+          <span class="status-dot"></span>
+          <span>Sistem tercihleri</span>
+        </div>
       </div>
     </div>
-    <div class="nodes-grid" id="nodesGrid"></div>
+
+    <div class="settings-container">
+
+      <!-- Bildirimler -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">🔔 Bildirimler</div>
+          <div class="settings-section-desc">Alarm bildirim tercihlerinizi yönetin</div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Sesli Uyarı</div>
+              <div class="settings-item-desc">Alarm geldiğinde ses çal</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingSound" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Tarayıcı Bildirimi</div>
+              <div class="settings-item-desc">Masaüstü bildirimleri göster</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingNotification" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Toast Bildirimleri</div>
+              <div class="settings-item-desc">Sağ üstte bildirim göster</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingToast" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Ses Seviyesi</div>
+              <div class="settings-item-desc">Alarm sesi seviyesi</div>
+            </div>
+            <input type="range" class="settings-range" id="settingVolume" min="0" max="100" value="15" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Harita -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">🗺️ Harita</div>
+          <div class="settings-section-desc">Harita görünüm tercihleri</div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Varsayılan Katman</div>
+              <div class="settings-item-desc">Harita açıldığında görünecek katman</div>
+            </div>
+            <select class="settings-select" id="settingMapLayer">
+              <option value="satellite">🛰️ Uydu</option>
+              <option value="terrain">🏔️ Topoğrafya</option>
+              <option value="streets">🗺️ Sokak</option>
+            </select>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Otomatik Zoom</div>
+              <div class="settings-item-desc">Yeni alarmda haritayı yakınlaştır</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingAutoZoom" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Isı Haritası</div>
+              <div class="settings-item-desc">Alarm yoğunluğunu göster</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingHeatmap">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tema -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">🎨 Tema</div>
+          <div class="settings-section-desc">Arayüz renk teması</div>
+        </div>
+        <div class="theme-grid" id="themeGrid">
+          <div class="theme-option active" data-theme="default">
+            <div class="theme-preview">
+              <div class="theme-preview-dot" style="background:#2ea043;"></div>
+              <div class="theme-preview-dot" style="background:#58a6ff;"></div>
+              <div class="theme-preview-dot" style="background:#f85149;"></div>
+            </div>
+            <div class="theme-name">Varsayılan</div>
+          </div>
+          <div class="theme-option" data-theme="ogm">
+            <div class="theme-preview">
+              <div class="theme-preview-dot" style="background:#006633;"></div>
+              <div class="theme-preview-dot" style="background:#00a04d;"></div>
+              <div class="theme-preview-dot" style="background:#cc0000;"></div>
+            </div>
+            <div class="theme-name">OGM</div>
+          </div>
+          <div class="theme-option" data-theme="afad">
+            <div class="theme-preview">
+              <div class="theme-preview-dot" style="background:#ff6600;"></div>
+              <div class="theme-preview-dot" style="background:#ff9933;"></div>
+              <div class="theme-preview-dot" style="background:#cc0000;"></div>
+            </div>
+            <div class="theme-name">AFAD</div>
+          </div>
+          <div class="theme-option" data-theme="jandarma">
+            <div class="theme-preview">
+              <div class="theme-preview-dot" style="background:#003366;"></div>
+              <div class="theme-preview-dot" style="background:#0066cc;"></div>
+              <div class="theme-preview-dot" style="background:#cc0000;"></div>
+            </div>
+            <div class="theme-name">Jandarma</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sistem -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">🔧 Sistem</div>
+          <div class="settings-section-desc">Sistem davranışı</div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Otomatik Yenileme</div>
+              <div class="settings-item-desc">Verileri otomatik güncelle</div>
+            </div>
+            <select class="settings-select" id="settingRefresh">
+              <option value="5">5 saniye</option>
+              <option value="10" selected>10 saniye</option>
+              <option value="30">30 saniye</option>
+              <option value="60">1 dakika</option>
+            </select>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Demo Modu</div>
+              <div class="settings-item-desc">Test için sahte veri</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingDemo" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Veri -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">💾 Veri</div>
+          <div class="settings-section-desc">Veri yönetimi</div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Veriyi Dışa Aktar</div>
+              <div class="settings-item-desc">Tüm alarm verisini JSON olarak indir</div>
+            </div>
+            <button class="btn" id="settingExportBtn" style="flex: 0; padding: 8px 14px;">📥 İndir</button>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Önbelleği Temizle</div>
+              <div class="settings-item-desc">Yerel depolamayı temizle</div>
+            </div>
+            <button class="btn" id="settingClearCacheBtn" style="flex: 0; padding: 8px 14px;">🗑️ Temizle</button>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Tüm Verileri Sil</div>
+              <div class="settings-item-desc">Geri alınamaz — dikkatli kullanın</div>
+            </div>
+            <button class="btn-danger-outline" id="settingResetBtn">⚠️ Sıfırla</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hakkında -->
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <div class="settings-section-title">ℹ️ Hakkında</div>
+          <div class="settings-section-desc">Sistem bilgileri</div>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Sürüm</div>
+              <div class="settings-item-desc">v2.1.0 — TEKNOFEST 2026</div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Takım</div>
+              <div class="settings-item-desc">Teknotim — Çevre ve Enerji Teknolojileri</div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-label">Geliştirici</div>
+              <div class="settings-item-desc">EcoAcoustic-AI Ekibi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
 </main>
@@ -1767,6 +2396,16 @@ body {
 
 <script>
 // ============================================================
+// AUTH — KULLANICI SİSTEMİ
+// ============================================================
+const USERS = {
+  admin:    { password: 'admin',    name: 'Genel Müdür',    role: 'Admin',    avatar: 'GM', color: '#f85149', permissions: ['all'] },
+  operator: { password: 'operator', name: 'Komuta Operatörü', role: 'Operatör', avatar: 'KO', color: '#2ea043', permissions: ['view','export','acknowledge'] },
+  field:    { password: 'field',    name: 'Saha Ekibi',     role: 'Saha',     avatar: 'SE', color: '#d29922', permissions: ['view','acknowledge','report'] },
+  viewer:   { password: 'viewer',   name: 'İzleyici',       role: 'İzleyici', avatar: 'İZ', color: '#58a6ff', permissions: ['view'] },
+};
+
+// ============================================================
 // VERİ
 // ============================================================
 const NODE_POSITIONS = [
@@ -1797,7 +2436,6 @@ class DemoDataEngine {
       ...n,
       battery: 3.3 + Math.random() * 0.8,
       status: 'online',
-      lastSeen: Date.now(),
       rssi: -60 - Math.floor(Math.random() * 35),
       temperature: 15 + Math.random() * 20,
       humidity: 40 + Math.random() * 40,
@@ -1806,7 +2444,6 @@ class DemoDataEngine {
     this.listeners = [];
     this.running = false;
     this.alertCount = 0;
-    this.startTime = Date.now();
   }
 
   onEvent(cb) { this.listeners.push(cb); }
@@ -1859,7 +2496,6 @@ class DemoDataEngine {
       this.nodes.forEach(n => {
         n.battery -= 0.0008 + Math.random() * 0.0015;
         n.temperature += (Math.random() - 0.5) * 0.5;
-        n.humidity += (Math.random() - 0.5) * 1;
         if (n.battery < 3.0 && n.status === 'online') n.status = 'lowbat';
         if (n.battery < 2.8 && n.status !== 'offline') n.status = 'offline';
       });
@@ -1867,6 +2503,11 @@ class DemoDataEngine {
       this.emit({ type: 'stats', data: this.getStats() });
     }, intervalMs);
     setTimeout(() => this.emit({ type: 'connected', data: {} }), 600);
+  }
+
+  stop() {
+    this.running = false;
+    clearInterval(this.interval);
   }
 
   getStats() {
@@ -1877,12 +2518,20 @@ class DemoDataEngine {
     const hourly = Array(24).fill(0);
     this.alerts.forEach(a => { hourly[new Date(a.timestamp).getHours()]++; });
     const avgConf = this.alerts.length ? this.alerts.reduce((s, a) => s + a.confidence, 0) / this.alerts.length : 0;
-    return { total: this.alerts.length, today: todayAlerts.length, avgConfidence: avgConf, byType, hourly };
+    const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
+    return {
+      total: this.alerts.length,
+      today: todayAlerts.length,
+      avgConfidence: avgConf,
+      byType, hourly,
+      topType: topType ? topType[0] : '—',
+      topTypeCount: topType ? topType[1] : 0,
+    };
   }
 }
 
 // ============================================================
-// SES YÖNETİCİSİ
+// SOUND
 // ============================================================
 class SoundManager {
   constructor() {
@@ -1987,7 +2636,7 @@ class SoundManager {
 }
 
 // ============================================================
-// HARİTA
+// MAP
 // ============================================================
 class ThreatMap {
   constructor(containerId) {
@@ -2004,7 +2653,6 @@ class ThreatMap {
       streets: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '© CartoDB' }),
     };
 
-    this.currentLayer = 'satellite';
     this.layers.satellite.addTo(this.map);
 
     this.markers = new Map();
@@ -2019,7 +2667,6 @@ class ThreatMap {
     this.initNodes();
     setTimeout(() => this.map.invalidateSize(), 200);
     window.addEventListener('resize', () => this.map.invalidateSize());
-    window.addEventListener('orientationchange', () => setTimeout(() => this.map.invalidateSize(), 300));
   }
 
   setLayer(layerName) {
@@ -2092,9 +2739,7 @@ class ThreatMap {
 
   focusAlert(alertId) {
     const entry = this.markers.get(alertId);
-    if (entry) {
-      this.map.flyTo([entry.alert.latitude, entry.alert.longitude], 13, { duration: 1 });
-    }
+    if (entry) this.map.flyTo([entry.alert.latitude, entry.alert.longitude], 13, { duration: 1 });
   }
 
   focusNode(nodeId) {
@@ -2107,76 +2752,12 @@ class ThreatMap {
 }
 
 // ============================================================
-// GRAFİKLER
-// ============================================================
-class StatsCharts {
-  constructor() {
-    Chart.defaults.color = '#666666';
-    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-    Chart.defaults.font.size = 10;
-
-    const ctx1 = document.getElementById('threatChart').getContext('2d');
-    this.threatChart = new Chart(ctx1, {
-      type: 'doughnut',
-      data: {
-        labels: ['Testere', 'Yangın', 'Silah', 'Kurcalama'],
-        datasets: [{
-          data: [0, 0, 0, 0],
-          backgroundColor: ['#f0b429', '#ff6b35', '#e5484d', '#a371f7'],
-          borderColor: '#0a0a0a', borderWidth: 3, hoverOffset: 6,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: { color: '#a1a1a1', font: { size: 11, weight: '600' }, padding: 12, boxWidth: 10, boxHeight: 10 }
-          }
-        },
-        cutout: '70%',
-      }
-    });
-
-    const ctx2 = document.getElementById('hourlyChart').getContext('2d');
-    const grad = ctx2.createLinearGradient(0, 0, 0, 200);
-    grad.addColorStop(0, 'rgba(46,160,67,.9)');
-    grad.addColorStop(1, 'rgba(46,160,67,.1)');
-
-    this.hourlyChart = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: Array.from({ length: 24 }, (_, i) => `${i}`),
-        datasets: [{ data: Array(24).fill(0), backgroundColor: grad, borderRadius: 3, borderSkipped: false }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: '#666', font: { size: 9 }, maxRotation: 0 }, grid: { display: false }, border: { display: false } },
-          y: { ticks: { color: '#666', font: { size: 9 } }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true }
-        }
-      }
-    });
-  }
-
-  update(stats) {
-    this.threatChart.data.datasets[0].data = [
-      stats.byType.chainsaw || 0, stats.byType.fire || 0,
-      stats.byType.gunshot || 0, stats.byType.tamper || 0,
-    ];
-    this.threatChart.update('none');
-    this.hourlyChart.data.datasets[0].data = stats.hourly;
-    this.hourlyChart.update('none');
-  }
-}
-
-// ============================================================
 // TOAST
 // ============================================================
 class ToastManager {
-  constructor() { this.container = document.getElementById('toastContainer'); }
+  constructor() { this.container = document.getElementById('toastContainer'); this.enabled = true; }
   show(message, type = 'info', duration = 4000) {
+    if (!this.enabled) return;
     const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -2190,41 +2771,248 @@ class ToastManager {
 }
 
 // ============================================================
-// ANA UYGULAMA
+// APP
 // ============================================================
 class EcoAcousticApp {
   constructor() {
+    this.user = null;
     this.alerts = [];
     this.nodes = [];
     this.currentFilter = 'all';
-    this.toast = new ToastManager();
-    this.sound = new SoundManager();
-    this.startTime = Date.now();
+    this.searchQuery = '';
+    this.nodeFilterValue = 'all';
     this.unreadAlerts = 0;
     this.lastAlertId = null;
+    this.currentPage = 'dashboard';
+
+    this.toast = new ToastManager();
+    this.sound = new SoundManager();
+    this.charts = {};
+
     this.init();
   }
 
   init() {
-    this.map = new ThreatMap('map');
-    this.charts = new StatsCharts();
-    this.bindUI();
-    this.bindDemoEngine();
+    this.bindLogin();
+    this.bindGlobalUI();
     this.startClock();
-    demoEngine.start(7000);
-    console.log('%c⚡ EcoAcoustic-AI v2.0', 'color:#2ea043;font-size:16px;font-weight:800;');
+    console.log('%c⚡ EcoAcoustic-AI v2.1', 'color:#2ea043;font-size:16px;font-weight:800;');
   }
 
-  bindUI() {
-    // Navbar linkleri
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
+  // ============================================================
+  // LOGIN
+  // ============================================================
+  bindLogin() {
+    const loginForm = document.getElementById('loginForm');
+    const loginScreen = document.getElementById('loginScreen');
+    const usernameInput = document.getElementById('loginUsername');
+    const passwordInput = document.getElementById('loginPassword');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // Demo hesap butonları
+    document.querySelectorAll('.demo-account').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const user = btn.dataset.user;
+        const u = USERS[user];
+        if (u) {
+          usernameInput.value = user;
+          passwordInput.value = user;
+          loginError.classList.remove('show');
+        }
       });
     });
 
-    // Filtreler
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = usernameInput.value.trim().toLowerCase();
+      const password = passwordInput.value;
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span>⏳</span><span>Giriş yapılıyor...</span>';
+
+      setTimeout(() => {
+        const u = USERS[username];
+        if (u && u.password === password) {
+          this.user = { username, ...u };
+          loginScreen.classList.add('hide');
+          document.getElementById('navbar').style.display = 'flex';
+          document.getElementById('main').style.display = 'block';
+          setTimeout(() => {
+            if (!this.map) {
+              this.map = new ThreatMap('map');
+              this.initCharts();
+              this.bindMapControls();
+              this.bindDemoEngine();
+              demoEngine.start(7000);
+            } else {
+              this.map.map.invalidateSize();
+            }
+            this.updateUserUI();
+            this.renderAlertsFull();
+            this.renderNodesFull();
+            this.updateAnalytics();
+            this.loadSettings();
+          }, 100);
+          this.toast.show(`Hoş geldin, ${u.name}`, 'success');
+        } else {
+          loginError.textContent = '❌ Kullanıcı adı veya şifre hatalı';
+          loginError.classList.add('show');
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<span>🔓</span><span>Giriş Yap</span>';
+        }
+      }, 600);
+    });
+
+    // Enter tuşu
+    [usernameInput, passwordInput].forEach(inp => {
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
+      });
+    });
+  }
+
+  updateUserUI() {
+    const u = this.user;
+    document.getElementById('userAvatar').textContent = u.avatar;
+    document.getElementById('userName').textContent = u.name;
+    document.getElementById('userAvatar').style.background = `linear-gradient(135deg, ${u.color}, ${u.color}88)`;
+    document.getElementById('dropdownAvatar').textContent = u.avatar;
+    document.getElementById('dropdownAvatar').style.background = `linear-gradient(135deg, ${u.color}, ${u.color}88)`;
+    document.getElementById('dropdownName').textContent = u.name;
+    document.getElementById('dropdownRole').textContent = u.role;
+    document.getElementById('welcomeUser').textContent = u.name;
+  }
+
+  // ============================================================
+  // UI BINDINGS
+  // ============================================================
+  bindGlobalUI() {
+    // Nav linkleri
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => this.goToPage(link.dataset.page));
+    });
+
+    // User dropdown
+    document.getElementById('userBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      document.getElementById('userDropdown').classList.remove('show');
+    });
+
+    document.getElementById('userDropdown').addEventListener('click', (e) => e.stopPropagation());
+
+    // Dropdown aksiyonları
+    document.querySelectorAll('.user-dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const action = item.dataset.action;
+        if (action === 'logout') this.logout();
+        else if (action === 'profile') this.toast.show('👤 Profil sayfası yakında', 'info');
+        else if (action === 'settings') this.goToPage('settings');
+        else if (action === 'help') this.toast.show('❓ Yardım için support@ecoacoustic.ai', 'info');
+        document.getElementById('userDropdown').classList.remove('show');
+      });
+    });
+
+    // Sound
+    document.getElementById('soundBtn').addEventListener('click', () => {
+      this.sound.enabled = !this.sound.enabled;
+      document.getElementById('soundBtn').classList.toggle('active', this.sound.enabled);
+      document.getElementById('soundIcon').textContent = this.sound.enabled ? '🔔' : '🔕';
+      this.sound.init();
+      this.toast.show(this.sound.enabled ? 'Ses açıldı' : 'Ses kapatıldı', this.sound.enabled ? 'success' : 'info');
+      // Ayarı kaydet
+      const s = this.getSettings();
+      s.sound = this.sound.enabled;
+      this.saveSettings(s);
+    });
+
+    // Export
+    document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
+
+    // Alerts
+    document.getElementById('alertsBtn').addEventListener('click', () => {
+      this.unreadAlerts = 0;
+      this.updateBadge();
+      this.goToPage('alerts');
+    });
+
+    // Modal
+    document.getElementById('modalClose').addEventListener('click', () => this.closeModal());
+    document.getElementById('modalCloseBtn').addEventListener('click', () => this.closeModal());
+    document.getElementById('modalGoBtn').addEventListener('click', () => {
+      const id = document.getElementById('detailModal').dataset.alertId;
+      if (id) {
+        this.goToPage('dashboard');
+        setTimeout(() => this.map.focusAlert(id), 100);
+      }
+      this.closeModal();
+    });
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'detailModal') this.closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeModal();
+        document.getElementById('userDropdown').classList.remove('show');
+      }
+    });
+
+    // Settings toggle
+    ['settingSound', 'settingNotification', 'settingToast', 'settingAutoZoom', 'settingHeatmap', 'settingDemo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => this.saveSettingFromUI(id, el.checked));
+      }
+    });
+
+    document.getElementById('settingVolume').addEventListener('input', (e) => {
+      const v = e.target.value / 100;
+      this.sound.setVolume(v);
+      this.saveSettingFromUI('settingVolume', v);
+    });
+
+    document.getElementById('settingMapLayer').addEventListener('change', (e) => {
+      this.map.setLayer(e.target.value);
+      this.saveSettingFromUI('settingMapLayer', e.target.value);
+    });
+
+    document.getElementById('settingRefresh').addEventListener('change', (e) => {
+      this.saveSettingFromUI('settingRefresh', e.target.value);
+      this.toast.show(`Yenileme: ${e.target.value}s`, 'success');
+    });
+
+    document.getElementById('settingExportBtn').addEventListener('click', () => this.exportData());
+
+    document.getElementById('settingClearCacheBtn').addEventListener('click', () => {
+      localStorage.removeItem('ecoacoustic_settings');
+      this.toast.show('🗑️ Önbellek temizlendi', 'success');
+    });
+
+    document.getElementById('settingResetBtn').addEventListener('click', () => {
+      if (confirm('Tüm veriler silinecek. Emin misiniz?')) {
+        localStorage.clear();
+        this.toast.show('⚠️ Tüm veriler silindi', 'warning');
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+
+    // Theme
+    document.querySelectorAll('.theme-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        this.applyTheme(opt.dataset.theme);
+        this.saveSettingFromUI('theme', opt.dataset.theme);
+      });
+    });
+  }
+
+  bindMapControls() {
     document.querySelectorAll('.map-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.map-filter-btn').forEach(b => b.classList.remove('active'));
@@ -2234,7 +3022,6 @@ class EcoAcousticApp {
       });
     });
 
-    // Katmanlar
     document.querySelectorAll('.map-layer-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const layer = btn.dataset.layer;
@@ -2250,70 +3037,183 @@ class EcoAcousticApp {
         }
       });
     });
-
-    // Ses
-    document.getElementById('soundBtn').addEventListener('click', () => {
-      this.sound.enabled = !this.sound.enabled;
-      document.getElementById('soundBtn').classList.toggle('active', this.sound.enabled);
-      document.getElementById('soundIcon').textContent = this.sound.enabled ? '🔔' : '🔕';
-      this.sound.init();
-      this.toast.show(
-        this.sound.enabled ? 'Ses açıldı' : 'Ses kapatıldı',
-        this.sound.enabled ? 'success' : 'info'
-      );
-    });
-
-    // Export
-    document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
-
-    // Alarmlar butonu
-    document.getElementById('alertsBtn').addEventListener('click', () => {
-      this.unreadAlerts = 0;
-      this.updateBadge();
-      this.toast.show(`${this.alerts.length} alarm`, 'info');
-    });
-
-    // Modal
-    document.getElementById('modalClose').addEventListener('click', () => this.closeModal());
-    document.getElementById('modalCloseBtn').addEventListener('click', () => this.closeModal());
-    document.getElementById('modalGoBtn').addEventListener('click', () => {
-      const id = document.getElementById('detailModal').dataset.alertId;
-      if (id) this.map.focusAlert(id);
-      this.closeModal();
-    });
-    document.getElementById('detailModal').addEventListener('click', (e) => {
-      if (e.target.id === 'detailModal') this.closeModal();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') this.closeModal();
-    });
   }
 
-  updateBadge() {
-    const badge = document.getElementById('navBadge');
-    if (this.unreadAlerts > 0) {
-      badge.style.display = 'block';
-      badge.textContent = this.unreadAlerts > 99 ? '99+' : this.unreadAlerts;
-    } else {
-      badge.style.display = 'none';
+  // ============================================================
+  // PAGE NAVIGATION
+  // ============================================================
+  goToPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const pageEl = document.getElementById(`page-${page}`);
+    const linkEl = document.querySelector(`.nav-link[data-page="${page}"]`);
+    if (pageEl) pageEl.classList.add('active');
+    if (linkEl) linkEl.classList.add('active');
+    this.currentPage = page;
+
+    // Harita boyutunu yeniden hesapla
+    if (page === 'dashboard' && this.map) {
+      setTimeout(() => this.map.map.invalidateSize(), 100);
+    }
+    if (page === 'analytics') this.updateAnalytics();
+    if (page === 'alerts') this.renderAlertsFull();
+    if (page === 'nodes') this.renderNodesFull();
+  }
+
+  // ============================================================
+  // CHARTS
+  // ============================================================
+  initCharts() {
+    Chart.defaults.color = '#666666';
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+    Chart.defaults.font.size = 10;
+
+    // Dashboard — Threat
+    const c1 = document.getElementById('threatChart');
+    if (c1) {
+      this.charts.threat = new Chart(c1.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Testere', 'Yangın', 'Silah', 'Kurcalama'],
+          datasets: [{
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#f0b429', '#ff6b35', '#e5484d', '#a371f7'],
+            borderColor: '#0a0a0a', borderWidth: 3,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#a1a1a1', font: { size: 11 }, padding: 12, boxWidth: 10, boxHeight: 10 } }
+          },
+          cutout: '70%',
+        }
+      });
+    }
+
+    // Dashboard — Hourly
+    const c2 = document.getElementById('hourlyChart');
+    if (c2) {
+      const grad = c2.getContext('2d').createLinearGradient(0, 0, 0, 200);
+      grad.addColorStop(0, 'rgba(46,160,67,.9)');
+      grad.addColorStop(1, 'rgba(46,160,67,.1)');
+      this.charts.hourly = new Chart(c2.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => `${i}`),
+          datasets: [{ data: Array(24).fill(0), backgroundColor: grad, borderRadius: 3 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#666', font: { size: 9 } }, grid: { display: false }, border: { display: false } },
+            y: { ticks: { color: '#666', font: { size: 9 } }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Analytics — Chart 1
+    const c3 = document.getElementById('analyticsChart1');
+    if (c3) {
+      this.charts.analytics1 = new Chart(c3.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['🪚 Testere', '🔥 Yangın', '🔫 Silah', '⚠️ Kurcalama'],
+          datasets: [{
+            label: 'Alarm Sayısı',
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#f0b429', '#ff6b35', '#e5484d', '#a371f7'],
+            borderRadius: 8,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#a1a1a1', font: { size: 12, weight: '600' } }, grid: { display: false }, border: { display: false } },
+            y: { ticks: { color: '#666' }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Analytics — Chart 2
+    const c4 = document.getElementById('analyticsChart2');
+    if (c4) {
+      this.charts.analytics2 = new Chart(c4.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+          datasets: [{
+            label: 'Alarm',
+            data: Array(24).fill(0),
+            borderColor: '#2ea043',
+            backgroundColor: 'rgba(46,160,67,.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#2ea043',
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#666', font: { size: 10 } }, grid: { display: false }, border: { display: false } },
+            y: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true }
+          }
+        }
+      });
     }
   }
 
+  updateCharts() {
+    const stats = demoEngine.getStats();
+    if (this.charts.threat) {
+      this.charts.threat.data.datasets[0].data = [
+        stats.byType.chainsaw || 0, stats.byType.fire || 0,
+        stats.byType.gunshot || 0, stats.byType.tamper || 0,
+      ];
+      this.charts.threat.update('none');
+    }
+    if (this.charts.hourly) {
+      this.charts.hourly.data.datasets[0].data = stats.hourly;
+      this.charts.hourly.update('none');
+    }
+    if (this.charts.analytics1) {
+      this.charts.analytics1.data.datasets[0].data = [
+        stats.byType.chainsaw || 0, stats.byType.fire || 0,
+        stats.byType.gunshot || 0, stats.byType.tamper || 0,
+      ];
+      this.charts.analytics1.update('none');
+    }
+    if (this.charts.analytics2) {
+      this.charts.analytics2.data.datasets[0].data = stats.hourly;
+      this.charts.analytics2.update('none');
+    }
+  }
+
+  // ============================================================
+  // DEMO ENGINE BINDINGS
+  // ============================================================
   bindDemoEngine() {
     demoEngine.onEvent((event) => {
       if (event.type === 'connected') {
-        this.toast.show('Sistem bağlantısı kuruldu', 'success');
+        // Silent
       } else if (event.type === 'alert') {
         this.handleNewAlert(event.data);
       } else if (event.type === 'nodes') {
         this.nodes = event.data;
         this.renderNodes();
-        this.renderBatteryList();
+        this.renderNodesFull();
         this.updateNodeMarkers();
+        this.renderBatteryList();
       } else if (event.type === 'stats') {
-        this.charts.update(event.data);
+        this.updateCharts();
         this.updateKPIs();
+        this.updateAnalytics();
       }
     });
   }
@@ -2344,17 +3244,25 @@ class EcoAcousticApp {
     document.getElementById('alertCountChip').textContent = `${this.alerts.length} alarm`;
 
     const health = onlineNodes >= 7 ? 'ok' : onlineNodes >= 5 ? 'warn' : 'bad';
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-    if (health === 'ok') {
-      statusDot.className = 'status-dot';
-      statusText.textContent = 'Tüm sistemler çalışıyor';
-    } else if (health === 'warn') {
-      statusDot.className = 'status-dot warning';
-      statusText.textContent = 'Bazı düğümler çevrimdışı';
-    } else {
-      statusDot.className = 'status-dot danger';
-      statusText.textContent = 'Kritik: Çoklu düğüm kayıp';
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    if (health === 'ok') { dot.className = 'status-dot'; txt.textContent = 'Tüm sistemler çalışıyor'; }
+    else if (health === 'warn') { dot.className = 'status-dot warning'; txt.textContent = 'Bazı düğümler çevrimdışı'; }
+    else { dot.className = 'status-dot danger'; txt.textContent = 'Kritik: Çoklu düğüm kayıp'; }
+  }
+
+  updateAnalytics() {
+    const stats = demoEngine.getStats();
+    const tEl = document.getElementById('analyticsTotal');
+    const tdEl = document.getElementById('analyticsToday');
+    const topEl = document.getElementById('analyticsTop');
+    const avgEl = document.getElementById('analyticsAvg');
+    if (tEl) tEl.textContent = stats.total;
+    if (tdEl) tdEl.textContent = stats.today;
+    if (avgEl) avgEl.textContent = `${(stats.avgConfidence * 100).toFixed(1)}%`;
+    if (topEl) {
+      const topThreat = THREAT_TYPES.find(t => t.type === stats.topType);
+      topEl.textContent = topThreat ? `${topThreat.icon} ${topThreat.label}` : '—';
     }
   }
 
@@ -2365,23 +3273,46 @@ class EcoAcousticApp {
     this.unreadAlerts++;
     this.map.addAlert(alert);
     this.renderActivity();
+    this.renderAlertsFull();
     this.updateBadge();
     this.updateKPIs();
 
-    if (alert.confidence > 0.91) {
-      this.sound.playAlarm(alert.threatType);
+    if (alert.confidence > 0.91) this.sound.playAlarm(alert.threatType);
+
+    const s = this.getSettings();
+    if (s.toast !== false) {
+      this.toast.show(`${alert.icon} ${alert.threatLabel} — ${alert.nodeName}`, alert.threatType === 'fire' ? 'error' : 'warning', 5000);
     }
-    this.toast.show(`${alert.icon} ${alert.threatLabel} — ${alert.nodeName}`, alert.threatType === 'fire' ? 'error' : 'warning', 5000);
+    if (s.notification !== false && 'Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`${alert.icon} ${alert.threatLabel}`, {
+          body: `${alert.nodeId} • ${(alert.confidence*100).toFixed(1)}%`,
+          tag: alert.id,
+        });
+      } catch(e) {}
+    }
   }
 
+  updateBadge() {
+    const badge = document.getElementById('navBadge');
+    if (this.unreadAlerts > 0) {
+      badge.style.display = 'block';
+      badge.textContent = this.unreadAlerts > 99 ? '99+' : this.unreadAlerts;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   renderActivity() {
     const feed = document.getElementById('activityFeed');
     const recent = this.alerts.slice(0, 20);
     if (recent.length === 0) {
-      feed.innerHTML = `<div class="empty-state" style="padding:40px 20px;">
-        <div class="empty-state-icon">📭</div>
-        <div class="empty-state-title">Henüz alarm yok</div>
-        <div class="empty-state-desc">Sistem dinliyor...</div>
+      feed.innerHTML = `<div style="text-align:center;color:#666;padding:40px 20px;font-size:12px;">
+        <div style="font-size:40px;opacity:.3;margin-bottom:12px;">📭</div>
+        <div>Henüz alarm yok</div>
       </div>`;
       return;
     }
@@ -2406,18 +3337,68 @@ class EcoAcousticApp {
     }).join('');
     feed.querySelectorAll('.activity-item').forEach(item => {
       item.addEventListener('click', () => {
-        const id = item.dataset.alertId;
-        const alert = this.alerts.find(a => a.id === id);
-        if (alert) {
-          this.map.focusAlert(id);
-          this.showDetail(alert);
-        }
+        const alert = this.alerts.find(a => a.id === item.dataset.alertId);
+        if (alert) { this.map.focusAlert(alert.id); this.showDetail(alert); }
+      });
+    });
+  }
+
+  renderAlertsFull() {
+    const list = document.getElementById('alertsListFull');
+    if (!list) return;
+    const filterType = document.getElementById('alertFilter')?.value || 'all';
+    let filtered = this.alerts;
+    if (filterType !== 'all') filtered = filtered.filter(a => a.threatType === filterType);
+    if (this.nodeFilterValue !== 'all') filtered = filtered.filter(a => a.nodeId === this.nodeFilterValue);
+    if (this.searchQuery) {
+      filtered = filtered.filter(a =>
+        a.nodeId.toLowerCase().includes(this.searchQuery) ||
+        a.threatLabel.toLowerCase().includes(this.searchQuery) ||
+        a.nodeName.toLowerCase().includes(this.searchQuery)
+      );
+    }
+
+    document.getElementById('alertsCountText').textContent = `${filtered.length} alarm`;
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div style="text-align:center;color:#666;padding:60px 20px;font-size:12px;">
+        <div style="font-size:48px;opacity:.3;margin-bottom:12px;">🔍</div>
+        <div>Alarm bulunamadı</div>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(a => {
+      const time = new Date(a.timestamp).toLocaleString('tr-TR');
+      const badgeClass = a.severity === 'high' ? 'high' : a.severity === 'med' ? 'med' : '';
+      return `
+        <div class="activity-item" data-alert-id="${a.id}" style="border-left: 3px solid ${a.color};">
+          <div class="activity-icon ${a.threatType}">${a.icon}</div>
+          <div class="activity-content">
+            <div class="activity-title">
+              <span>${a.threatLabel}</span>
+              <span class="activity-badge ${badgeClass}">${(a.confidence*100).toFixed(1)}%</span>
+            </div>
+            <div class="activity-meta">
+              <span>📡 ${a.nodeId}</span>
+              <span>📍 ${a.nodeName}</span>
+              <span>🕐 ${time}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    list.querySelectorAll('.activity-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const alert = this.alerts.find(a => a.id === item.dataset.alertId);
+        if (alert) { this.map.focusAlert(alert.id); this.showDetail(alert); }
       });
     });
   }
 
   renderNodes() {
     const grid = document.getElementById('nodesGrid');
+    if (!grid) return;
     document.getElementById('nodeCountChip').textContent = `${this.nodes.length} düğüm`;
     grid.innerHTML = this.nodes.map(n => {
       const statusClass = n.status === 'offline' ? 'danger' : n.status === 'lowbat' ? 'warning' : '';
@@ -2450,16 +3431,62 @@ class EcoAcousticApp {
     grid.querySelectorAll('.node-tile').forEach(tile => {
       tile.addEventListener('click', () => {
         const node = this.nodes.find(n => n.id === tile.dataset.nodeId);
-        if (node) {
-          this.map.focusNode(node.id);
-          this.showNodeDetail(node);
-        }
+        if (node) { this.map.focusNode(node.id); this.showNodeDetail(node); }
+      });
+    });
+  }
+
+  renderNodesFull() {
+    const grid = document.getElementById('nodesGridFull');
+    if (!grid) return;
+    document.getElementById('nodesStatusText').textContent = `${this.nodes.length} düğüm aktif`;
+    grid.innerHTML = this.nodes.map(n => {
+      const statusClass = n.status === 'offline' ? 'danger' : n.status === 'lowbat' ? 'warning' : '';
+      const statusText = n.status === 'offline' ? 'Çevrimdışı' : n.status === 'lowbat' ? 'Düşük Pil' : 'Aktif';
+      const battPct = Math.min(100, Math.max(0, ((n.battery - 2.8) / (4.2 - 2.8)) * 100));
+      const battClass = battPct < 20 ? 'danger' : battPct < 50 ? 'warning' : '';
+      return `
+        <div class="node-tile ${statusClass}" data-node-id="${n.id}">
+          <div class="node-tile-header">
+            <span class="node-tile-id">${n.id}</span>
+            <span class="node-tile-status ${statusClass}">${statusText}</span>
+          </div>
+          <div class="node-tile-name">${n.name} • ${n.altitude}m</div>
+          <div class="node-tile-stats">
+            <div class="node-stat">
+              <span class="node-stat-label">Pil</span>
+              <span class="node-stat-value">${n.battery.toFixed(2)}V</span>
+            </div>
+            <div class="node-stat">
+              <span class="node-stat-label">RSSI</span>
+              <span class="node-stat-value">${n.rssi} dBm</span>
+            </div>
+            <div class="node-stat">
+              <span class="node-stat-label">Sıcaklık</span>
+              <span class="node-stat-value">${n.temperature.toFixed(1)}°C</span>
+            </div>
+            <div class="node-stat">
+              <span class="node-stat-label">Bugün</span>
+              <span class="node-stat-value">${n.alarmsToday}</span>
+            </div>
+          </div>
+          <div class="node-battery-bar">
+            <div class="node-battery-fill ${battClass}" style="width:${battPct}%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    grid.querySelectorAll('.node-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        const node = this.nodes.find(n => n.id === tile.dataset.nodeId);
+        if (node) { this.goToPage('dashboard'); setTimeout(() => { this.map.focusNode(node.id); this.showNodeDetail(node); }, 200); }
       });
     });
   }
 
   renderBatteryList() {
     const list = document.getElementById('batteryList');
+    if (!list) return;
     list.innerHTML = this.nodes.map(n => {
       const pct = Math.min(100, Math.max(0, ((n.battery - 2.8) / (4.2 - 2.8)) * 100));
       const cls = pct < 20 ? 'danger' : pct < 50 ? 'warning' : '';
@@ -2475,14 +3502,15 @@ class EcoAcousticApp {
     }).join('');
   }
 
+  // ============================================================
+  // MODALS
+  // ============================================================
   showDetail(alert) {
     const modal = document.getElementById('detailModal');
     modal.dataset.alertId = alert.id;
     document.getElementById('modalIcon').textContent = alert.icon;
-    document.getElementById('modalIcon').style.color = alert.color;
     document.getElementById('modalTitle').textContent = alert.threatLabel;
     document.getElementById('modalSubtitle').textContent = `${alert.nodeId} — ${alert.nodeName}`;
-
     const time = new Date(alert.timestamp).toLocaleString('tr-TR');
     const confClass = alert.confidence > 0.93 ? 'high' : '';
 
@@ -2490,9 +3518,7 @@ class EcoAcousticApp {
       <div class="modal-section">
         <div class="modal-section-title">Güven Skoru</div>
         <div class="confidence-bar">
-          <div class="confidence-fill ${confClass}" style="width:${alert.confidence*100}%">
-            ${(alert.confidence*100).toFixed(1)}%
-          </div>
+          <div class="confidence-fill ${confClass}" style="width:${alert.confidence*100}%">${(alert.confidence*100).toFixed(1)}%</div>
         </div>
       </div>
       <div class="modal-section">
@@ -2519,19 +3545,15 @@ class EcoAcousticApp {
     const modal = document.getElementById('detailModal');
     modal.dataset.alertId = '';
     document.getElementById('modalIcon').textContent = '📡';
-    document.getElementById('modalIcon').style.color = 'var(--primary)';
     document.getElementById('modalTitle').textContent = node.id;
     document.getElementById('modalSubtitle').textContent = node.name;
-
     const battPct = Math.min(100, Math.max(0, ((node.battery - 2.8) / (4.2 - 2.8)) * 100));
 
     document.getElementById('modalBody').innerHTML = `
       <div class="modal-section">
         <div class="modal-section-title">Pil Durumu</div>
         <div class="confidence-bar">
-          <div class="confidence-fill ${battPct < 30 ? 'high' : ''}" style="width:${battPct}%">
-            ${battPct.toFixed(0)}% — ${node.battery.toFixed(2)}V
-          </div>
+          <div class="confidence-fill ${battPct < 30 ? 'high' : ''}" style="width:${battPct}%">${battPct.toFixed(0)}% — ${node.battery.toFixed(2)}V</div>
         </div>
       </div>
       <div class="modal-section">
@@ -2560,23 +3582,111 @@ class EcoAcousticApp {
     document.getElementById('detailModal').classList.remove('show');
   }
 
-  startClock() {
-    const update = () => {
-      const now = new Date();
-      document.getElementById('clock').textContent =
-        now.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
-        ' • ' +
-        now.toLocaleTimeString('tr-TR');
-    };
-    update();
-    setInterval(update, 1000);
+  // ============================================================
+  // SETTINGS
+  // ============================================================
+  getSettings() {
+    try {
+      return JSON.parse(localStorage.getItem('ecoacoustic_settings') || '{}');
+    } catch(e) { return {}; }
   }
 
+  saveSettings(s) {
+    localStorage.setItem('ecoacoustic_settings', JSON.stringify(s));
+  }
+
+  saveSettingFromUI(id, value) {
+    const key = id.replace('setting', '').toLowerCase();
+    const s = this.getSettings();
+    s[key] = value;
+    this.saveSettings(s);
+  }
+
+  loadSettings() {
+    const s = this.getSettings();
+    if (s.sound !== undefined) {
+      document.getElementById('settingSound').checked = s.sound;
+      this.sound.enabled = s.sound;
+      document.getElementById('soundIcon').textContent = s.sound ? '🔔' : '🔕';
+      document.getElementById('soundBtn').classList.toggle('active', s.sound);
+    }
+    if (s.notification !== undefined) document.getElementById('settingNotification').checked = s.notification;
+    if (s.toast !== undefined) {
+      document.getElementById('settingToast').checked = s.toast;
+      this.toast.enabled = s.toast;
+    }
+    if (s.volume !== undefined) {
+      document.getElementById('settingVolume').value = s.volume * 100;
+      this.sound.setVolume(s.volume);
+    }
+    if (s.maplayer) {
+      document.getElementById('settingMapLayer').value = s.maplayer;
+      if (this.map) this.map.setLayer(s.maplayer);
+    }
+    if (s.autozoom !== undefined) document.getElementById('settingAutoZoom').checked = s.autozoom;
+    if (s.heatmap !== undefined) {
+      document.getElementById('settingHeatmap').checked = s.heatmap;
+      if (this.map && s.heatmap) this.map.toggleHeat(true);
+    }
+    if (s.refresh) document.getElementById('settingRefresh').value = s.refresh;
+    if (s.demo !== undefined) document.getElementById('settingDemo').checked = s.demo;
+    if (s.theme) {
+      document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+      const opt = document.querySelector(`.theme-option[data-theme="${s.theme}"]`);
+      if (opt) opt.classList.add('active');
+      this.applyTheme(s.theme);
+    }
+  }
+
+  applyTheme(name) {
+    const THEMES = {
+      default: { primary: '#2ea043', info: '#58a6ff', danger: '#f85149' },
+      ogm: { primary: '#00a04d', info: '#006633', danger: '#cc0000' },
+      afad: { primary: '#ff6600', info: '#ff9933', danger: '#cc0000' },
+      jandarma: { primary: '#0066cc', info: '#003366', danger: '#cc0000' },
+    };
+    const t = THEMES[name] || THEMES.default;
+    document.documentElement.style.setProperty('--primary', t.primary);
+    document.documentElement.style.setProperty('--primary-2', t.primary);
+    document.documentElement.style.setProperty('--info', t.info);
+    document.documentElement.style.setProperty('--danger', t.danger);
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
+  logout() {
+    if (!confirm('Çıkış yapmak istediğinizden emin misiniz?')) return;
+    demoEngine.stop();
+    this.user = null;
+    this.alerts = [];
+    this.unreadAlerts = 0;
+    this.updateBadge();
+    document.getElementById('navbar').style.display = 'none';
+    document.getElementById('main').style.display = 'none';
+    document.getElementById('loginScreen').classList.remove('hide');
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginBtn').disabled = false;
+    document.getElementById('loginBtn').innerHTML = '<span>🔓</span><span>Giriş Yap</span>';
+    document.getElementById('loginError').classList.remove('show');
+    if (this.map) {
+      document.querySelectorAll('.leaflet-marker-icon').forEach(m => m.remove());
+      this.map.markers.clear();
+    }
+    // Sayfayı yenile (temiz başlangıç)
+    setTimeout(() => location.reload(), 500);
+  }
+
+  // ============================================================
+  // EXPORT
+  // ============================================================
   exportData() {
     const data = {
       exportTime: new Date().toISOString(),
       region: 'Erzurum',
-      system: 'EcoAcoustic-AI v2.0',
+      system: 'EcoAcoustic-AI v2.1',
+      user: this.user ? this.user.name : 'unknown',
       totalAlerts: this.alerts.length,
       nodes: this.nodes,
       alerts: this.alerts,
@@ -2590,18 +3700,63 @@ class EcoAcousticApp {
     URL.revokeObjectURL(url);
     this.toast.show(`${this.alerts.length} alarm indirildi`, 'success');
   }
+
+  // ============================================================
+  // CLOCK
+  // ============================================================
+  startClock() {
+    const update = () => {
+      const now = new Date();
+      const str = now.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' • ' + now.toLocaleTimeString('tr-TR');
+      ['clock', 'alertsClock', 'nodesClock', 'analyticsClock'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = str;
+      });
+    };
+    update();
+    setInterval(update, 1000);
+  }
 }
 
 // ============================================================
-// GLOBAL
+// DEMO ENGINE INSTANCE
 // ============================================================
 const demoEngine = new DemoDataEngine();
 
+// ============================================================
+// ALERT FILTERS (for alerts page)
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new EcoAcousticApp();
-  window.app.renderActivity();
-  window.app.renderNodes();
-  window.app.updateKPIs();
+
+  // Alert filters binding
+  setTimeout(() => {
+    const searchEl = document.getElementById('alertSearch');
+    const filterEl = document.getElementById('alertFilter');
+    const nodeEl = document.getElementById('nodeFilter');
+
+    if (searchEl) {
+      searchEl.addEventListener('input', (e) => {
+        window.app.searchQuery = e.target.value.toLowerCase();
+        window.app.renderAlertsFull();
+      });
+    }
+    if (filterEl) {
+      filterEl.addEventListener('change', () => window.app.renderAlertsFull());
+    }
+    if (nodeEl) {
+      NODE_POSITIONS.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n.id;
+        opt.textContent = `${n.id} — ${n.name}`;
+        nodeEl.appendChild(opt);
+      });
+      nodeEl.addEventListener('change', (e) => {
+        window.app.nodeFilterValue = e.target.value;
+        window.app.renderAlertsFull();
+      });
+    }
+  }, 100);
 });
 </script>
 </body>
