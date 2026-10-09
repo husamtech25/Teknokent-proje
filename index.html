@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="EcoAcoustic" />
-<title>EcoAcoustic-AI v4.1 — OGM Komuta Merkezi</title>
+<title>EcoAcoustic-AI v4.2 — OGM Komuta Merkezi</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
@@ -23,9 +23,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-/* ============================================================
-   🎨 RESET & DEĞİŞKENLER
-   ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 :root {
@@ -91,7 +88,6 @@
   --shadow-5: 0 40px 100px rgba(0,0,0,.6);
   --glass-bg: rgba(10,10,10,.72);
   --glass-bg-2: rgba(17,17,17,.85);
-  --glass-bg-3: rgba(10,10,10,.85);
   --glass-border: rgba(255,255,255,.08);
   --glass-border-2: rgba(255,255,255,.12);
   --glass-blur: blur(20px) saturate(180%);
@@ -162,7 +158,7 @@ body > * { position: relative; z-index: 1; }
 ::selection { background: var(--primary-soft); color: var(--primary-3); }
 
 /* ============================================================
-   🎨 ANIMASYONLAR
+   ANIMASYONLAR
    ============================================================ */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -180,21 +176,6 @@ body > * { position: relative; z-index: 1; }
 @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
 @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
 @keyframes countUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-/* ============================================================
-   GLASS
-   ============================================================ */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  position: relative;
-}
-
-@supports not (backdrop-filter: blur(20px)) {
-  .glass, .glass-2 { background: rgba(10,10,10,.95); }
-}
 
 /* ============================================================
    LOGIN
@@ -268,6 +249,7 @@ body > * { position: relative; z-index: 1; }
 }
 
 .login-form { display: flex; flex-direction: column; gap: var(--sp-4); }
+
 .form-group { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 .form-label {
@@ -299,6 +281,30 @@ body > * { position: relative; z-index: 1; }
   background: var(--bg-4);
 }
 .form-input::placeholder { color: var(--text-4); }
+
+/* Beni Hatırla */
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.remember-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  border-radius: var(--r-1);
+}
+
+.remember-label {
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
 
 .login-btn {
   padding: var(--sp-4);
@@ -347,44 +353,23 @@ body > * { position: relative; z-index: 1; }
 }
 .login-error.show { display: block; animation: shake .4s; }
 
-.login-demo {
+/* Login Info */
+.login-info {
   margin-top: var(--sp-5);
   padding-top: var(--sp-5);
   border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.login-demo-title {
-  font-size: 10px;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  font-weight: 700;
-  margin-bottom: var(--sp-3);
-}
-
-.demo-accounts { display: flex; gap: var(--sp-2); justify-content: center; flex-wrap: wrap; }
-
-.demo-account {
-  padding: var(--sp-2) var(--sp-3);
-  background: var(--bg-3);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r-3);
-  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
   font-size: 11px;
+  color: var(--text-3);
   font-weight: 600;
-  cursor: pointer;
-  transition: all var(--t-base);
-  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: .5px;
 }
 
-.demo-account:hover {
-  border-color: var(--primary);
-  color: var(--primary-3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
-.demo-account:active { transform: scale(.95); }
+.login-info-icon { font-size: 14px; }
 
 /* ============================================================
    NAVBAR
@@ -513,9 +498,7 @@ body > * { position: relative; z-index: 1; }
   border: 2px solid var(--bg);
 }
 
-/* ============================================================
-   USER MENU
-   ============================================================ */
+/* USER MENU */
 .user-menu-wrapper { position: relative; }
 
 .nav-user {
@@ -641,9 +624,7 @@ body > * { position: relative; z-index: 1; }
 .user-dropdown-icon { font-size: 16px; }
 .user-dropdown-divider { height: 1px; background: var(--border); margin: var(--sp-2) 0; }
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+/* MAIN */
 .main {
   padding: var(--sp-6) calc(var(--sp-5) + var(--safe-right)) calc(var(--sp-6) + var(--safe-bottom)) calc(var(--sp-5) + var(--safe-left));
   max-width: 1600px;
@@ -655,9 +636,7 @@ body > * { position: relative; z-index: 1; }
 .page { display: none; }
 .page.active { display: block; animation: pageIn .35s var(--t-base); }
 
-/* ============================================================
-   WELCOME
-   ============================================================ */
+/* WELCOME */
 .welcome {
   margin-bottom: var(--sp-6);
   display: flex;
@@ -731,9 +710,7 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: -.3px;
 }
 
-/* ============================================================
-   KPI
-   ============================================================ */
+/* KPI */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -850,9 +827,7 @@ body > * { position: relative; z-index: 1; }
 
 .kpi-change.down { background: var(--danger-soft); color: var(--danger-2); border-color: rgba(248,81,73,.15); }
 
-/* ============================================================
-   GRID & CARDS
-   ============================================================ */
+/* GRID & CARDS */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -924,9 +899,7 @@ body > * { position: relative; z-index: 1; }
   box-shadow: 0 0 8px var(--primary);
 }
 
-/* ============================================================
-   MAP
-   ============================================================ */
+/* MAP */
 .map-container {
   position: relative;
   height: 540px;
@@ -1100,9 +1073,7 @@ body > * { position: relative; z-index: 1; }
   flex-shrink: 0;
 }
 
-/* ============================================================
-   ACTIVITY
-   ============================================================ */
+/* ACTIVITY */
 .activity-feed {
   max-height: 540px;
   overflow-y: auto;
@@ -1180,9 +1151,7 @@ body > * { position: relative; z-index: 1; }
   font-weight: 500;
 }
 
-/* ============================================================
-   BOTTOM GRID
-   ============================================================ */
+/* BOTTOM GRID */
 .bottom-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
@@ -1196,9 +1165,7 @@ body > * { position: relative; z-index: 1; }
   position: relative;
 }
 
-/* ============================================================
-   NODES
-   ============================================================ */
+/* NODES */
 .nodes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -1311,9 +1278,7 @@ body > * { position: relative; z-index: 1; }
 .node-battery-fill.warning { background: linear-gradient(90deg, var(--warning), var(--warning-2)); box-shadow: 0 0 8px var(--warning-glow); }
 .node-battery-fill.danger { background: linear-gradient(90deg, var(--danger), var(--danger-2)); box-shadow: 0 0 8px var(--danger-glow); }
 
-/* ============================================================
-   VIRTUAL SCROLL
-   ============================================================ */
+/* VIRTUAL SCROLL */
 .virtual-scroll-container {
   position: relative;
   overflow-y: auto;
@@ -1422,9 +1387,7 @@ body > * { position: relative; z-index: 1; }
   box-shadow: var(--shadow-2);
 }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
+/* MODAL */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1608,9 +1571,7 @@ body > * { position: relative; z-index: 1; }
 .btn.primary:hover { box-shadow: 0 12px 28px var(--primary-glow); transform: translateY(-2px); }
 .btn.danger { background: linear-gradient(135deg, var(--danger), var(--danger-2)); border-color: var(--danger); color: white; box-shadow: 0 4px 16px var(--danger-glow); }
 
-/* ============================================================
-   SETTINGS
-   ============================================================ */
+/* SETTINGS */
 .settings-container { max-width: 800px; margin: 0 auto; }
 
 .settings-section {
@@ -1806,9 +1767,7 @@ body > * { position: relative; z-index: 1; }
 
 .btn-danger-outline:hover { background: var(--danger); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px var(--danger-glow); }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+/* TOAST */
 .toast-container {
   position: fixed;
   top: calc(80px + var(--safe-top));
@@ -1846,9 +1805,7 @@ body > * { position: relative; z-index: 1; }
 .toast-icon { font-size: 18px; flex-shrink: 0; }
 .toast-text { font-size: 12px; color: var(--text); font-weight: 700; }
 
-/* ============================================================
-   MARKER
-   ============================================================ */
+/* MARKER */
 .custom-marker {
   width: 34px;
   height: 34px;
@@ -1895,9 +1852,7 @@ body > * { position: relative; z-index: 1; }
   pointer-events: none;
 }
 
-/* ============================================================
-   PWA INSTALL BANNER
-   ============================================================ */
+/* PWA INSTALL */
 #pwa-install-btn {
   position: fixed;
   bottom: calc(var(--sp-5) + var(--safe-bottom));
@@ -1923,7 +1878,6 @@ body > * { position: relative; z-index: 1; }
 #pwa-install-btn:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 32px var(--primary-glow); }
 #pwa-install-btn:active { transform: scale(.97); }
 
-/* Offline badge */
 #offline-badge {
   position: fixed;
   top: calc(80px + var(--safe-top));
@@ -1943,9 +1897,7 @@ body > * { position: relative; z-index: 1; }
 
 #offline-badge.show { display: block; }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .main-grid { grid-template-columns: 1fr; }
@@ -2013,17 +1965,22 @@ body > * { position: relative; z-index: 1; }
   <div class="login-container">
     <div class="login-logo"><div class="login-logo-icon">🌲</div></div>
     <h1 class="login-title">EcoAcoustic-AI</h1>
-    <p class="login-subtitle">OGM Komuta Merkezi — Güvenli Giriş</p>
+    <p class="login-subtitle">OGM Komuta Merkezi — Yetkili Giriş</p>
 
     <form class="login-form" id="loginForm">
       <div class="form-group">
         <label class="form-label">Kullanıcı Adı</label>
-        <input type="text" class="form-input" id="loginUsername" placeholder="operatör" autocomplete="username" />
+        <input type="text" class="form-input" id="loginUsername" placeholder="Kullanıcı adınız" autocomplete="username" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Şifre</label>
         <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <div class="remember-row">
+        <input type="checkbox" class="remember-checkbox" id="rememberMe" />
+        <label class="remember-label" for="rememberMe">Beni hatırla (7 gün)</label>
       </div>
 
       <div class="login-error" id="loginError"></div>
@@ -2034,14 +1991,9 @@ body > * { position: relative; z-index: 1; }
       </button>
     </form>
 
-    <div class="login-demo">
-      <div class="login-demo-title">Demo Hesaplar</div>
-      <div class="demo-accounts">
-        <button class="demo-account" data-user="admin">👑 Admin</button>
-        <button class="demo-account" data-user="operator">🎯 Operatör</button>
-        <button class="demo-account" data-user="field">🚒 Saha</button>
-        <button class="demo-account" data-user="viewer">👁️ İzleyici</button>
-      </div>
+    <div class="login-info">
+      <span class="login-info-icon">🔒</span>
+      <span>Yetkili Kullanıcı Girişi</span>
     </div>
   </div>
 </div>
@@ -2461,7 +2413,7 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info"><div class="settings-item-label">Sürüm</div><div class="settings-item-desc">v4.1.0 — PWA — TEKNOFEST 2026</div></div>
+            <div class="settings-item-info"><div class="settings-item-label">Sürüm</div><div class="settings-item-desc">v4.2.0 — PWA — TEKNOFEST 2026</div></div>
           </div>
           <div class="settings-item">
             <div class="settings-item-info"><div class="settings-item-label">Takım</div><div class="settings-item-desc">Teknotim — Çevre ve Enerji Teknolojileri</div></div>
@@ -2509,12 +2461,12 @@ body > * { position: relative; z-index: 1; }
 
 <script>
 // ============================================================
-// PWA SERVICE WORKER + INSTALL PROMPT
+// PWA SERVICE WORKER
 // ============================================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then((reg) => console.log('%c✅ PWA Service Worker kayıtlı', 'color:#2ea043;font-weight:bold;', reg.scope))
+      .then((reg) => console.log('%c✅ PWA Service Worker kayıtlı', 'color:#2ea043;font-weight:bold;'))
       .catch((err) => console.warn('⚠️ SW kayıt hatası:', err));
   });
 }
@@ -2523,7 +2475,6 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  console.log('📱 PWA yüklenebilir');
   showInstallButton();
 });
 
@@ -2536,7 +2487,6 @@ function showInstallButton() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`PWA install: ${outcome}`);
       deferredPrompt = null;
       btn.remove();
     }
@@ -2545,28 +2495,36 @@ function showInstallButton() {
 }
 
 window.addEventListener('appinstalled', () => {
-  console.log('✅ PWA yüklendi');
   const btn = document.getElementById('pwa-install-btn');
   if (btn) btn.remove();
 });
 
-// Online/Offline detection
-window.addEventListener('online', () => {
-  document.getElementById('offline-badge').classList.remove('show');
-});
-window.addEventListener('offline', () => {
-  document.getElementById('offline-badge').classList.add('show');
-});
+window.addEventListener('online', () => document.getElementById('offline-badge').classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offline-badge').classList.add('show'));
 if (!navigator.onLine) document.getElementById('offline-badge').classList.add('show');
 
 // ============================================================
-// USERS
+// 🔐 KULLANICI SİSTEMİ
 // ============================================================
+// Şifreler Base64 kodlu. Yeni kullanıcı için:
+// Konsolda: btoa('şifre') → hash
+// ============================================================
+
 const USERS = {
-  admin:    { password: 'admin',    name: 'Genel Müdür',      role: 'Admin',    avatar: 'GM', color: '#f85149' },
-  operator: { password: 'operator', name: 'Komuta Operatörü', role: 'Operatör', avatar: 'KO', color: '#2ea043' },
-  field:    { password: 'field',    name: 'Saha Ekibi',       role: 'Saha',     avatar: 'SE', color: '#d29922' },
-  viewer:   { password: 'viewer',   name: 'İzleyici',         role: 'İzleyici', avatar: 'İZ', color: '#58a6ff' },
+  'Havvanur': {
+    hash: 'SGF2dmFudXIyNTM0',  // Havvanur2534
+    name: 'Havvanur',
+    role: 'Admin',
+    avatar: 'HV',
+    color: '#f85149'
+  },
+  'Hüsamettin': {
+    hash: 'RmF0aWhpbmZlZGFpc2kuMjU=',  // Fatihinfedaisi.25
+    name: 'Hüsamettin',
+    role: 'Admin',
+    avatar: 'HÜ',
+    color: '#2ea043'
+  }
 };
 
 // ============================================================
@@ -2961,9 +2919,12 @@ class EcoAcousticApp {
       const navbar = document.getElementById('navbar');
       if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 10);
     });
-    console.log('%c⚡ EcoAcoustic-AI v4.1 — PWA', 'color:#2ea043;font-size:14px;font-weight:800;');
+    console.log('%c⚡ EcoAcoustic-AI v4.2 — Kullanıcı Sistemi', 'color:#2ea043;font-size:14px;font-weight:800;');
   }
 
+  // ============================================================
+  // LOGIN
+  // ============================================================
   bindLogin() {
     const loginForm = document.getElementById('loginForm');
     const loginScreen = document.getElementById('loginScreen');
@@ -2971,55 +2932,165 @@ class EcoAcousticApp {
     const passwordInput = document.getElementById('loginPassword');
     const loginError = document.getElementById('loginError');
     const loginBtn = document.getElementById('loginBtn');
+    const rememberMe = document.getElementById('rememberMe');
 
-    document.querySelectorAll('.demo-account').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const user = btn.dataset.user;
-        usernameInput.value = user;
-        passwordInput.value = user;
-        loginError.classList.remove('show');
-      });
-    });
+    // Kilit verisi
+    const getLockData = () => {
+      try { return JSON.parse(localStorage.getItem('ecoacoustic_lock') || '{}'); }
+      catch(e) { return {}; }
+    };
+    const setLockData = (data) => localStorage.setItem('ecoacoustic_lock', JSON.stringify(data));
+    const MAX_ATTEMPTS = 3;
+    const LOCK_DURATION = 30 * 1000;
 
+    // Kullanıcı adı normalize
+    const normalizeUsername = (input) => {
+      const lower = input.toLowerCase().trim();
+      return Object.keys(USERS).find(k => k.toLowerCase() === lower);
+    };
+
+    // Şifre doğrula
+    const verifyPassword = (password, hash) => {
+      try { return btoa(password) === hash; }
+      catch(e) { return false; }
+    };
+
+    // Kayıtlı oturum kontrolü
+    const savedUser = localStorage.getItem('ecoacoustic_user');
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        // 7 gün geçtiyse geçersiz
+        if (u && u.username && USERS[u.username] && (Date.now() - u.timestamp < 7 * 24 * 60 * 60 * 1000)) {
+          setTimeout(() => {
+            usernameInput.value = u.username;
+            passwordInput.value = '******';
+            this.attemptLogin(u.username, USERS[u.username], true);
+          }, 500);
+        } else {
+          localStorage.removeItem('ecoacoustic_user');
+        }
+      } catch(e) {}
+    }
+
+    // Başarısız deneme takibi
+    const trackFailedAttempt = (username = 'unknown') => {
+      const lock = getLockData();
+      if (!lock[username]) lock[username] = { attempts: 0, lockedUntil: 0 };
+      lock[username].attempts++;
+      
+      if (lock[username].attempts >= MAX_ATTEMPTS) {
+        lock[username].lockedUntil = Date.now() + LOCK_DURATION;
+        lock[username].attempts = 0;
+        setTimeout(() => {
+          loginError.textContent = `🔒 3 yanlış deneme. 30 saniye kilitlendi.`;
+        }, 100);
+      } else {
+        const remaining = MAX_ATTEMPTS - lock[username].attempts;
+        setTimeout(() => {
+          loginError.textContent += ` (${remaining} hak kaldı)`;
+        }, 100);
+      }
+      setLockData(lock);
+    };
+
+    // Form gönder
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const username = usernameInput.value.trim().toLowerCase();
+      
+      const rawUsername = usernameInput.value.trim();
       const password = passwordInput.value;
+
+      if (!rawUsername || !password) {
+        loginError.textContent = '❌ Kullanıcı adı ve şifre gerekli';
+        loginError.classList.add('show');
+        return;
+      }
+
+      // Kullanıcı adı normalize (büyük/küçük harf)
+      const username = normalizeUsername(rawUsername);
+      if (!username) {
+        loginError.textContent = '❌ Kullanıcı adı veya şifre hatalı';
+        loginError.classList.add('show');
+        trackFailedAttempt();
+        return;
+      }
+
+      // Kilit kontrolü
+      const lockData = getLockData();
+      if (lockData[username] && lockData[username].lockedUntil > Date.now()) {
+        const remaining = Math.ceil((lockData[username].lockedUntil - Date.now()) / 1000);
+        loginError.textContent = `🔒 Hesap kilitli. ${remaining} saniye bekleyin.`;
+        loginError.classList.add('show');
+        return;
+      }
+
+      // Şifre kontrolü
+      const user = USERS[username];
+      if (!verifyPassword(password, user.hash)) {
+        loginError.textContent = '❌ Kullanıcı adı veya şifre hatalı';
+        loginError.classList.add('show');
+        trackFailedAttempt(username);
+        return;
+      }
+
+      // BAŞARILI GİRİŞ
       loginBtn.disabled = true;
       loginBtn.innerHTML = '<span>⏳</span><span>Giriş yapılıyor...</span>';
 
       setTimeout(() => {
-        const u = USERS[username];
-        if (u && u.password === password) {
-          this.user = { username, ...u };
-          loginScreen.classList.add('hide');
-          document.getElementById('navbar').style.display = 'flex';
-          document.getElementById('main').style.display = 'block';
-          setTimeout(() => {
-            if (!this.map) {
-              this.map = new ThreatMap('map');
-              this.initCharts();
-              this.bindMapControls();
-              this.bindDemoEngine();
-              this.initVirtualScroll();
-              demoEngine.start(15000);
-            } else {
-              this.map.map.invalidateSize();
-            }
-            this.updateUserUI();
-            this.renderNodesFull();
-            this.updateAnalytics();
-            this.loadSettings();
-          }, 100);
-          this.toast.show(`Hoş geldin, ${u.name}`, 'success');
-        } else {
-          loginError.textContent = '❌ Kullanıcı adı veya şifre hatalı';
-          loginError.classList.add('show');
-          loginBtn.disabled = false;
-          loginBtn.innerHTML = '<span>🔓</span><span>Giriş Yap</span>';
+        // Kilit temizle
+        const lock = getLockData();
+        delete lock[username];
+        setLockData(lock);
+
+        // Beni hatırla
+        if (rememberMe && rememberMe.checked) {
+          localStorage.setItem('ecoacoustic_user', JSON.stringify({
+            username: username,
+            timestamp: Date.now()
+          }));
         }
+
+        this.attemptLogin(username, user, false);
       }, 600);
     });
+
+    // Enter tuşu
+    [usernameInput, passwordInput].forEach(inp => {
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
+      });
+    });
+  }
+
+  // Giriş başarılı
+  attemptLogin(username, user, isAuto) {
+    this.user = { username, ...user };
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('navbar').style.display = 'flex';
+    document.getElementById('main').style.display = 'block';
+    
+    setTimeout(() => {
+      if (!this.map) {
+        this.map = new ThreatMap('map');
+        this.initCharts();
+        this.bindMapControls();
+        this.bindDemoEngine();
+        this.initVirtualScroll();
+        demoEngine.start(15000);
+      } else {
+        this.map.map.invalidateSize();
+      }
+      this.updateUserUI();
+      this.renderNodesFull();
+      this.updateAnalytics();
+      this.loadSettings();
+    }, 100);
+    
+    if (!isAuto) {
+      this.toast.show(`Hoş geldin, ${user.name}`, 'success');
+    }
   }
 
   updateUserUI() {
@@ -3050,9 +3121,9 @@ class EcoAcousticApp {
       item.addEventListener('click', () => {
         const action = item.dataset.action;
         if (action === 'logout') this.logout();
-        else if (action === 'profile') this.toast.show('👤 Profil sayfası yakında', 'info');
+        else if (action === 'profile') this.toast.show(`👤 ${this.user.name} — ${this.user.role}`, 'info');
         else if (action === 'settings') this.goToPage('settings');
-        else if (action === 'help') this.toast.show('❓ Yardım için support@ecoacoustic.ai', 'info');
+        else if (action === 'help') this.toast.show('❓ Yardım: support@ecoacoustic.ai', 'info');
         document.getElementById('userDropdown').classList.remove('show');
       });
     });
@@ -3565,11 +3636,14 @@ class EcoAcousticApp {
     this.alerts = [];
     this.unreadAlerts = 0;
     this.updateBadge();
+    localStorage.removeItem('ecoacoustic_user');
     document.getElementById('navbar').style.display = 'none';
     document.getElementById('main').style.display = 'none';
     document.getElementById('loginScreen').classList.remove('hide');
     document.getElementById('loginUsername').value = '';
     document.getElementById('loginPassword').value = '';
+    const rm = document.getElementById('rememberMe');
+    if (rm) rm.checked = false;
     document.getElementById('loginBtn').disabled = false;
     document.getElementById('loginBtn').innerHTML = '<span>🔓</span><span>Giriş Yap</span>';
     document.getElementById('loginError').classList.remove('show');
@@ -3577,7 +3651,7 @@ class EcoAcousticApp {
   }
 
   exportData() {
-    const data = { exportTime: new Date().toISOString(), region: 'Erzurum', system: 'EcoAcoustic-AI v4.1 PWA', user: this.user ? this.user.name : 'unknown', totalAlerts: this.alerts.length, nodes: this.nodes, alerts: this.alerts };
+    const data = { exportTime: new Date().toISOString(), region: 'Erzurum', system: 'EcoAcoustic-AI v4.2', user: this.user ? this.user.name : 'unknown', totalAlerts: this.alerts.length, nodes: this.nodes, alerts: this.alerts };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
