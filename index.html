@@ -2461,13 +2461,46 @@ body > * { position: relative; z-index: 1; }
 
 <script>
 // ============================================================
-// PWA SERVICE WORKER
+// 🔄 SERVICE WORKER GÜNCELLEME
 // ============================================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then((reg) => console.log('%c✅ PWA Service Worker kayıtlı', 'color:#2ea043;font-weight:bold;'))
+      .then((reg) => {
+        console.log('%c✅ PWA Service Worker kayıtlı', 'color:#2ea043;font-weight:bold;');
+        
+        // Güncelleme kontrolü — her 30 saniyede bir
+        setInterval(() => {
+          reg.update();
+        }, 30000);
+        
+        // Yeni SW bulunduğunda
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          console.log('🔄 Yeni Service Worker bulundu');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('✅ Yeni versiyon hazır — yenileniyor...');
+              // Otomatik yenile
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            }
+          });
+        });
+      })
       .catch((err) => console.warn('⚠️ SW kayıt hatası:', err));
+  });
+
+  // SW kontrol değiştiğinde — güncelleme olduğunda
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      console.log('🔄 Sayfa yenileniyor...');
+      window.location.reload();
+    }
   });
 }
 
