@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+<meta name="theme-color" content="#2ea043" />
+<title>EcoAcoustic-AI — Cihaz Simülasyonu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #000; --bg-2: #0a0a0a; --bg-3: #111; --bg-4: #1a1a1a; --bg-5: #222;
+  --border: #1f1f1f; --border-2: #2a2a2a; --border-3: #333; --border-hover: #404040;
+  --text: #ededed; --text-2: #a1a1a1; --text-3: #666; --text-4: #444;
+  --primary: #2ea043; --primary-2: #3fb950; --primary-3: #56d364;
+  --primary-glow: rgba(46,160,67,.2); --primary-soft: rgba(46,160,67,.1);
+  --danger: #f85149; --danger-2: #ff7b72; --danger-glow: rgba(248,81,73,.2); --danger-soft: rgba(248,81,73,.1);
+  --warning: #d29922; --warning-2: #f0b429; --warning-glow: rgba(210,153,34,.2); --warning-soft: rgba(210,153,34,.1);
+  --info: #58a6ff; --info-2: #79c0ff; --info-glow: rgba(88,166,255,.2); --info-soft: rgba(88,166,255,.1);
+  --purple: #a371f7; --purple-2: #bc8cff; --purple-glow: rgba(163,113,247,.2); --purple-soft: rgba(163,113,247,.1);
+  --fire: #ff6b35; --chainsaw: #f0b429; --gunshot: #e5484d; --tamper: #a371f7;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+  --r-1: 4px; --r-2: 6px; --r-3: 8px; --r-4: 12px; --r-5: 16px; --r-6: 20px; --r-full: 999px;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.3); --shadow-2: 0 4px 12px rgba(0,0,0,.35);
+  --shadow-3: 0 12px 32px rgba(0,0,0,.4); --shadow-4: 0 24px 64px rgba(0,0,0,.5); --shadow-5: 0 40px 100px rgba(0,0,0,.6);
+  --glass-bg: rgba(10,10,10,.72); --glass-bg-2: rgba(17,17,17,.85);
+  --glass-border: rgba(255,255,255,.08); --glass-border-2: rgba(255,255,255,.12);
+  --glass-blur: blur(20px) saturate(180%);
+  --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px); --safe-right: env(safe-area-inset-right, 0px);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+  --t-fast: .15s cubic-bezier(.4,0,.2,1); --t-base: .25s cubic-bezier(.4,0,.2,1);
+  --t-slow: .4s cubic-bezier(.4,0,.2,1); --t-spring: .5s cubic-bezier(.34,1.56,.64,1);
+}
+html, body { font-family: var(--font-sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body { position: relative; padding-bottom: 80px; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(46,160,67,.08) 0%, transparent 40%), radial-gradient(circle at 80% 90%, rgba(88,166,255,.05) 0%, transparent 40%); pointer-events: none; z-index: 0; }
+body > * { position: relative; z-index: 1; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: var(--r-full); }
+::selection { background: var(--primary-soft); color: var(--primary-3); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modalIn { from { opacity: 0; transform: scale(.94) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes logoPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px var(--primary-glow)); } 50% { transform: scale(1.08); filter: drop-shadow(0 0 35px var(--primary-glow)); } }
+@keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+@keyframes pulseScale { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: .85; } }
+@keyframes soundWave { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(3); opacity: 0; } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes sendPulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px currentColor; } 50% { transform: scale(1.15); box-shadow: 0 0 50px currentColor; } }
+@keyframes ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.header { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) calc(var(--sp-5) + var(--safe-right)) var(--sp-4) calc(var(--sp-5) + var(--safe-left)); padding-top: calc(var(--sp-4) + var(--safe-top)); background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); gap: var(--sp-4); }
+.header-left { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.back-btn { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); background: var(--bg-3); border: 1px solid var(--border-2); border-radius: var(--r-3); color: var(--text-2); font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all var(--t-base); white-space: nowrap; }
+.back-btn:hover { background: var(--bg-4); color: var(--text); transform: translateX(-3px); }
+.header-title { font-size: 16px; font-weight: 800; letter-spacing: -.3px; display: flex; align-items: center; gap: var(--sp-2); }
+.header-badge { font-size: 10px; padding: 3px 8px; background: var(--primary-soft); color: var(--primary-3); border: 1px solid rgba(46,160,67,.3); border-radius: var(--r-2); font-weight: 800; text-transform: uppercase; }
+.header-actions { display: flex; gap: var(--sp-2); }
+.header-btn { width: 38px; height: 38px; border-radius: var(--r-3); background: transparent; border: 1px solid var(--border-2); color: var(--text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all var(--t-base); }
+.header-btn:hover { background: var(--bg-3); color: var(--text); transform: translateY(-2px); }
+.status-banner { background: linear-gradient(90deg, var(--glass-bg-2), var(--glass-bg)); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); padding: var(--sp-3) calc(var(--sp-5) + var(--safe-right)) var(--sp-3) calc(var(--sp-5) + var(--safe-left)); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); font-size: 12px; flex-wrap: wrap; }
+.status-info { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 12px var(--primary); animation: pulse 2s infinite; position: relative; }
+.status-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: inherit; opacity: .3; animation: ping 2s ease-out infinite; }
+.status-text { color: var(--text-2); font-weight: 600; }
+.status-text strong { color: var(--primary-3); font-weight: 800; }
+.send-count { padding: var(--sp-1) var(--sp-3); background: var(--info-soft); color: var(--info-2); border: 1px solid rgba(88,166,255,.3); border-radius: var(--r-2); font-weight: 800; font-family: var(--font-mono); font-size: 11px; }
+.panel-status { padding: var(--sp-1) var(--sp-3); border-radius: var(--r-2); font-weight: 800; font-family: var(--font-mono); font-size: 11px; display: flex; align-items: center; gap: 6px; }
+.panel-status.connected { background: var(--primary-soft); color: var(--primary-3); border: 1px solid rgba(46,160,67,.3); }
+.panel-status.disconnected { background: var(--warning-soft); color: var(--warning-2); border: 1px solid rgba(210,153,34,.3); }
+.main { max-width: 1400px; margin: 0 auto; padding: var(--sp-6) calc(var(--sp-5) + var(--safe-right)) var(--sp-7) calc(var(--sp-5) + var(--safe-left)); }
+.hero { text-align: center; padding: var(--sp-6) 0 var(--sp-7); animation: slideInUp .5s var(--t-base); }
+.hero-icon { font-size: 64px; margin-bottom: var(--sp-3); animation: logoPulse 3s ease-in-out infinite; display: inline-block; }
+.hero-title { font-size: 40px; font-weight: 900; letter-spacing: -1.5px; background: linear-gradient(90deg, #fff 0%, var(--primary-3) 50%, var(--info-2) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: var(--sp-3); line-height: 1.1; }
+.hero-desc { font-size: 15px; color: var(--text-2); max-width: 700px; margin: 0 auto; line-height: 1.7; }
+.hero-stats { display: flex; justify-content: center; gap: var(--sp-5); margin-top: var(--sp-5); flex-wrap: wrap; }
+.hero-stat { display: flex; flex-direction: column; gap: 2px; padding: var(--sp-3) var(--sp-5); background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--r-4); }
+.hero-stat-value { font-size: 24px; font-weight: 900; color: var(--primary-3); font-family: var(--font-mono); }
+.hero-stat-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; font-weight: 700; }
+.section { margin-bottom: var(--sp-7); animation: slideInUp .6s var(--t-base) backwards; }
+.section-header { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-5); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--border); }
+.section-icon { width: 44px; height: 44px; border-radius: var(--r-3); background: linear-gradient(135deg, var(--primary-soft), var(--info-soft)); border: 1px solid rgba(46,160,67,.3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.section-title { font-size: 22px; font-weight: 900; letter-spacing: -.6px; }
+.section-subtitle { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.device-3d-container { background: linear-gradient(180deg, var(--bg-2), var(--bg)); border: 1px solid var(--border); border-radius: var(--r-6); padding: var(--sp-6); position: relative; overflow: hidden; min-height: 550px; display: flex; align-items: center; justify-content: center; perspective: 1200px; }
+.device-3d-container::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, var(--primary-soft) 0%, transparent 60%); pointer-events: none; }
+.device-scene { position: relative; width: 320px; height: 420px; transform-style: preserve-3d; transform: rotateX(-8deg) rotateY(0deg); transition: transform .5s cubic-bezier(.4,0,.2,1); animation: float 4s ease-in-out infinite; }
+.device-body { position: absolute; inset: 0; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid var(--border-3); border-radius: var(--r-6); box-shadow: inset 0 0 40px rgba(0,0,0,.6), 0 40px 80px rgba(0,0,0,.6), 0 0 80px var(--primary-glow); overflow: hidden; }
+.device-body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--info), var(--primary)); background-size: 200% 100%; animation: gradientMove 3s linear infinite; }
+.device-part { position: absolute; border-radius: var(--r-3); cursor: pointer; transition: all var(--t-base); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; font-size: 9px; font-weight: 700; text-align: center; border: 2px solid; background: rgba(0,0,0,.6); backdrop-filter: blur(10px); z-index: 2; }
+.device-part:hover { transform: scale(1.15); z-index: 10; box-shadow: 0 0 30px currentColor; }
+.device-part-icon { font-size: 20px; line-height: 1; filter: drop-shadow(0 0 6px currentColor); }
+.device-part-name { font-size: 8px; text-transform: uppercase; letter-spacing: .3px; color: var(--text-2); font-family: var(--font-mono); white-space: nowrap; }
+.part-esp32 { top: 30px; left: 50%; transform: translateX(-50%); width: 140px; height: 80px; color: var(--primary); border-color: var(--primary); background: linear-gradient(135deg, rgba(46,160,67,.15), rgba(0,0,0,.6)); }
+.part-inmp441 { top: 130px; left: 20px; width: 100px; height: 70px; color: var(--info); border-color: var(--info); background: linear-gradient(135deg, rgba(88,166,255,.15), rgba(0,0,0,.6)); }
+.part-sx1276 { top: 130px; right: 20px; width: 100px; height: 70px; color: var(--warning); border-color: var(--warning); background: linear-gradient(135deg, rgba(210,153,34,.15), rgba(0,0,0,.6)); }
+.part-mpu6050 { top: 220px; left: 20px; width: 100px; height: 70px; color: var(--purple); border-color: var(--purple); background: linear-gradient(135deg, rgba(163,113,247,.15), rgba(0,0,0,.6)); }
+.part-battery { top: 220px; right: 20px; width: 100px; height: 70px; color: var(--danger); border-color: var(--danger); background: linear-gradient(135deg, rgba(248,81,73,.15), rgba(0,0,0,.6)); }
+.part-solar { top: 310px; left: 50%; transform: translateX(-50%); width: 200px; height: 60px; color: var(--primary-2); border-color: var(--primary-2); background: linear-gradient(135deg, rgba(63,185,80,.15), rgba(0,0,0,.6)); }
+.device-part.active { animation: pulseScale 1.5s infinite; box-shadow: 0 0 30px currentColor; }
+.device-part.sending { animation: sendPulse .6s infinite; }
+.antenna { position: absolute; top: -30px; right: 40px; width: 4px; height: 40px; background: linear-gradient(180deg, var(--warning), transparent); border-radius: 2px; z-index: 3; }
+.antenna::before { content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 20px var(--warning); animation: pulse 1.5s infinite; }
+.sound-waves { position: absolute; top: 165px; left: 10px; z-index: 1; pointer-events: none; }
+.sound-wave { width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--info); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: soundWave 2s infinite; opacity: 0; }
+.sound-wave:nth-child(2) { animation-delay: .7s; }
+.sound-wave:nth-child(3) { animation-delay: 1.4s; }
+.rotate-hint { position: absolute; bottom: var(--sp-4); right: var(--sp-4); padding: var(--sp-2) var(--sp-3); background: var(--glass-bg-2); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-2); border-radius: var(--r-3); font-size: 11px; color: var(--text-3); font-weight: 600; display: flex; align-items: center; gap: var(--sp-2); pointer-events: none; }
+.device-controls { position: absolute; top: var(--sp-4); left: var(--sp-4); display: flex; gap: var(--sp-2); z-index: 5; }
+.device-ctrl-btn { padding: var(--sp-2) var(--sp-3); background: var(--glass-bg-2); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-2); border-radius: var(--r-3); color: var(--text-2); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all var(--t-base); display: flex; align-items: center; gap: 6px; }
+.device-ctrl-btn:hover { color: var(--text); background: var(--bg-4); transform: translateY(-2px); }
+.device-ctrl-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
+.parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); }
+.part-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--r-5); padding: var(--sp-4); cursor: pointer; transition: all var(--t-base); position: relative; overflow: hidden; animation: slideInUp .5s var(--t-base) backwards; }
+.part-card:hover { border-color: var(--part-color, var(--primary)); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.4), 0 0 40px var(--part-color-glow, var(--primary-glow)); }
+.part-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--part-color, var(--primary)); }
+.part-card-header { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.part-card-icon { width: 44px; height: 44px; border-radius: var(--r-3); background: var(--bg-4); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; color: var(--part-color, var(--primary)); transition: transform var(--t-spring); }
+.part-card:hover .part-card-icon { transform: scale(1.1) rotate(-8deg); }
+.part-card-info { flex: 1; min-width: 0; }
+.part-card-name { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+.part-card-model { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; }
+.part-card-desc { font-size: 11px; color: var(--text-2); line-height: 1.6; margin-bottom: var(--sp-3); }
+.part-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.part-tag { font-size: 9px; padding: 2px 8px; border-radius: var(--r-2); background: var(--bg-4); border: 1px solid var(--border-2); color: var(--text-3); font-weight: 700; text-transform: uppercase; }
+.part-tag.primary { background: var(--primary-soft); color: var(--primary-3); border-color: rgba(46,160,67,.3); }
+.part-tag.info { background: var(--info-soft); color: var(--info-2); border-color: rgba(88,166,255,.3); }
+.part-tag.warning { background: var(--warning-soft); color: var(--warning-2); border-color: rgba(210,153,34,.3); }
+.part-tag.danger { background: var(--danger-soft); color: var(--danger-2); border-color: rgba(248,81,73,.3); }
+.part-tag.purple { background: var(--purple-soft); color: var(--purple-2); border-color: rgba(163,113,247,.3); }
+.pin-table { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-5); overflow: hidden; }
+.pin-table-header { display: grid; grid-template-columns: 1fr 1fr 2fr; padding: var(--sp-3) var(--sp-4); background: var(--bg-3); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; }
+.pin-row { display: grid; grid-template-columns: 1fr 1fr 2fr; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); font-size: 12px; align-items: center; transition: background var(--t-fast); }
+.pin-row:hover { background: var(--bg-3); }
+.pin-row:last-child { border-bottom: none; }
+.pin-esp { font-family: var(--font-mono); color: var(--primary-3); font-weight: 700; }
+.pin-component { font-family: var(--font-mono); color: var(--info-2); font-weight: 700; }
+.pin-desc { color: var(--text-2); font-size: 11px; }
+.simulation { background: linear-gradient(180deg, var(--bg-2), var(--bg)); border: 1px solid var(--border); border-radius: var(--r-6); padding: var(--sp-6); position: relative; overflow: hidden; }
+.sim-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.sim-node { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-4); background: var(--glass-bg); border: 2px solid var(--border-2); border-radius: var(--r-4); transition: all var(--t-base); min-height: 120px; justify-content: center; }
+.sim-node.active { border-color: var(--node-color, var(--primary)); background: linear-gradient(135deg, var(--node-color-soft, var(--primary-soft)), var(--bg-3)); box-shadow: 0 0 40px var(--node-color-glow, var(--primary-glow)); transform: scale(1.05); }
+.sim-node-icon { font-size: 36px; transition: transform var(--t-spring); }
+.sim-node.active .sim-node-icon { animation: pulseScale 1s infinite; }
+.sim-node-label { font-size: 10px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; text-align: center; }
+.sim-node-value { font-size: 12px; font-weight: 700; text-align: center; min-height: 16px; }
+.sim-node-value.active { color: var(--node-color, var(--primary)); }
+.sim-arrow { font-size: 20px; color: var(--text-4); transition: all var(--t-base); }
+.sim-arrow.active { color: var(--primary-3); transform: scale(1.3); }
+.sim-controls { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; }
+.sim-btn { padding: var(--sp-3) var(--sp-5); background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; border: none; border-radius: var(--r-3); font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer; transition: all var(--t-base); display: flex; align-items: center; gap: var(--sp-2); box-shadow: 0 8px 24px var(--primary-glow); text-transform: uppercase; letter-spacing: .5px; }
+.sim-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px var(--primary-glow); }
+.sim-btn:active { transform: scale(.97); }
+.sim-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.sim-btn.secondary { background: var(--bg-3); color: var(--text); border: 1px solid var(--border-2); box-shadow: none; }
+.sim-btn.secondary:hover { background: var(--bg-4); border-color: var(--border-3); box-shadow: var(--shadow-2); }
+.sim-btn.fire { background: linear-gradient(135deg, #ff6b35, #f0b429); }
+.sim-btn.fire:hover { box-shadow: 0 12px 32px rgba(255,107,53,.4); }
+.sim-btn.active { background: linear-gradient(135deg, var(--danger), var(--warning)); animation: pulse 1.5s infinite; }
+.sim-log { margin-top: var(--sp-5); background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r-4); padding: var(--sp-4); font-family: var(--font-mono); font-size: 11px; max-height: 200px; overflow-y: auto; }
+.sim-log-line { padding: 3px 0; color: var(--text-3); display: flex; gap: var(--sp-2); animation: fadeIn .3s; }
+.sim-log-time { color: var(--text-4); flex-shrink: 0; }
+.sim-log-msg { color: var(--text-2); }
+.sim-log-msg.success { color: var(--primary-3); }
+.sim-log-msg.info { color: var(--info-2); }
+.sim-log-msg.warning { color: var(--warning-2); }
+.sim-log-msg.error { color: var(--danger-2); }
+.history-container { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-5); overflow: hidden; max-height: 400px; overflow-y: auto; }
+.history-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); transition: all var(--t-base); animation: slideInRight .3s; }
+.history-item:hover { background: var(--bg-3); }
+.history-item:last-child { border-bottom: none; }
+.history-icon { width: 40px; height: 40px; border-radius: var(--r-3); background: var(--bg-4); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.history-content { flex: 1; min-width: 0; }
+.history-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.history-meta { font-size: 10px; color: var(--text-3); display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+.history-badge { font-size: 10px; padding: 2px 8px; border-radius: var(--r-2); background: var(--primary-soft); color: var(--primary-3); font-weight: 800; border: 1px solid rgba(46,160,67,.3); }
+.history-empty { text-align: center; padding: var(--sp-7) var(--sp-5); color: var(--text-3); }
+.history-empty-icon { font-size: 48px; opacity: .3; margin-bottom: var(--sp-3); }
+.history-empty-text { font-size: 13px; font-weight: 600; }
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--sp-4); }
+.how-step { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-5); padding: var(--sp-5); position: relative; overflow: hidden; transition: all var(--t-base); }
+.how-step:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: var(--shadow-3); }
+.how-step::before { content: attr(data-step); position: absolute; top: -20px; right: -10px; font-size: 100px; font-weight: 900; color: var(--primary-soft); font-family: var(--font-mono); line-height: 1; pointer-events: none; }
+.how-step-icon { font-size: 32px; margin-bottom: var(--sp-3); filter: drop-shadow(0 0 12px var(--primary-glow)); position: relative; z-index: 1; }
+.how-step-title { font-size: 15px; font-weight: 800; margin-bottom: var(--sp-2); position: relative; z-index: 1; }
+.how-step-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; position: relative; z-index: 1; }
+.code-block { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-4); overflow: hidden; }
+.code-tabs { display: flex; background: var(--bg-3); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+.code-tabs::-webkit-scrollbar { display: none; }
+.code-tab { padding: var(--sp-3) var(--sp-4); background: transparent; border: none; color: var(--text-3); font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--t-base); white-space: nowrap; text-transform: uppercase; }
+.code-tab:hover { color: var(--text); background: var(--bg-4); }
+.code-tab.active { color: var(--primary-3); border-bottom-color: var(--primary); }
+.code-content { padding: var(--sp-5); font-family: var(--font-mono); font-size: 12px; line-height: 1.7; overflow-x: auto; color: var(--text-2); white-space: pre; }
+.code-content .kw { color: var(--purple-2); font-weight: 700; }
+.code-content .str { color: var(--primary-3); }
+.code-content .num { color: var(--warning-2); }
+.code-content .cmt { color: var(--text-4); font-style: italic; }
+.code-content .fn { color: var(--info-2); }
+.code-panel { display: none; }
+.code-panel.active { display: block; animation: fadeIn .3s; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: var(--sp-5); animation: fadeIn .2s; }
+.modal-backdrop.show { display: flex; }
+.modal { background: var(--glass-bg-2); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-2); border-radius: var(--r-6); max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; animation: modalIn .35s var(--t-spring); box-shadow: var(--shadow-5); }
+.modal-header { padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: var(--sp-4); }
+.modal-icon { width: 60px; height: 60px; border-radius: var(--r-4); background: var(--bg-3); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.modal-title-wrap { flex: 1; min-width: 0; }
+.modal-title { font-size: 20px; font-weight: 900; margin-bottom: 2px; letter-spacing: -.4px; }
+.modal-subtitle { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); text-transform: uppercase; font-weight: 700; }
+.modal-close { width: 36px; height: 36px; border-radius: var(--r-3); background: var(--bg-3); border: 1px solid var(--border-2); color: var(--text-2); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all var(--t-base); flex-shrink: 0; }
+.modal-close:hover { background: var(--danger); color: white; transform: rotate(90deg); }
+.modal-body { padding: var(--sp-5) var(--sp-6); }
+.modal-section { margin-bottom: var(--sp-5); }
+.modal-section:last-child { margin-bottom: 0; }
+.modal-section-title { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: var(--sp-3); }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.modal-grid-item { background: var(--bg-3); padding: var(--sp-3); border-radius: var(--r-3); border: 1px solid var(--border-2); }
+.modal-grid-label { font-size: 9px; color: var(--text-4); text-transform: uppercase; margin-bottom: var(--sp-1); font-weight: 800; }
+.modal-grid-value { font-size: 13px; font-weight: 700; font-family: var(--font-mono); }
+.modal-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+.toast-container { position: fixed; top: calc(80px + var(--safe-top)); right: calc(var(--sp-5) + var(--safe-right)); z-index: 10000; display: flex; flex-direction: column; gap: var(--sp-3); pointer-events: none; max-width: 400px; }
+.toast { background: var(--glass-bg-2); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border-2); border-left: 3px solid var(--primary); border-radius: var(--r-3); padding: var(--sp-3) var(--sp-4); box-shadow: var(--shadow-4); animation: slideInRight .35s var(--t-spring); pointer-events: all; display: flex; align-items: center; gap: var(--sp-3); }
+.toast.success { border-left-color: var(--primary); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast.info { border-left-color: var(--info); }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast-text { font-size: 12px; font-weight: 700; }
+@media (max-width: 900px) {
+  .sim-flow { grid-template-columns: 1fr; gap: var(--sp-2); }
+  .sim-arrow { transform: rotate(90deg); }
+  .sim-arrow.active { transform: rotate(90deg) scale(1.3); }
+  .sim-node { min-height: 80px; padding: var(--sp-3); flex-direction: row; gap: var(--sp-3); }
+  .sim-node-icon { font-size: 24px; }
+}
+@media (max-width: 768px) {
+  .header { padding: var(--sp-3) calc(var(--sp-4) + var(--safe-right)) var(--sp-3) calc(var(--sp-4) + var(--safe-left)); }
+  .header-title { font-size: 14px; }
+  .header-badge { display: none; }
+  .main { padding: var(--sp-4) calc(var(--sp-4) + var(--safe-right)) var(--sp-5) calc(var(--sp-4) + var(--safe-left)); }
+  .hero-title { font-size: 28px; }
+  .hero-icon { font-size: 48px; }
+  .section-title { font-size: 18px; }
+  .device-3d-container { min-height: 420px; padding: var(--sp-4); }
+  .device-scene { transform: scale(.75); }
+  .parts-grid { grid-template-columns: 1fr; }
+  .pin-table-header, .pin-row { grid-template-columns: 1fr 1fr; }
+  .pin-desc { grid-column: 1 / -1; margin-top: 4px; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: var(--sp-2); }
+  .hero-stat { padding: var(--sp-2) var(--sp-3); }
+  .hero-stat-value { font-size: 18px; }
+  .device-controls { top: var(--sp-3); left: var(--sp-3); }
+  .device-ctrl-btn { font-size: 10px; padding: 6px 10px; }
+  .status-banner { font-size: 11px; padding: var(--sp-2) calc(var(--sp-4) + var(--safe-right)) var(--sp-2) calc(var(--sp-4) + var(--safe-left)); }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-left">
+    <button class="back-btn" onclick="location.href='index.html'"><span>←</span><span>Geri</span></button>
+    <div class="header-title"><span>🔧</span><span>Cihaz Simülasyonu</span><span class="header-badge">v1.0</span></div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="resetAll()" title="Sıfırla">🔄</button>
+    <button class="header-btn" onclick="window.print()" title="Yazdır">🖨️</button>
+  </div>
+</header>
+<div class="status-banner">
+  <div class="status-info">
+    <span class="status-dot"></span>
+    <span class="status-text">Panel Bağlantısı: <strong id="panelStatus">Kontrol ediliyor...</strong></span>
+  </div>
+  <div class="status-info">
+    <span class="send-count" id="sendCount">📤 0 alarm gönderildi</span>
+    <span class="panel-status connected" id="panelBadge"><span>🔗</span><span>index.html</span></span>
+  </div>
+</div>
+<main class="main">
+  <section class="hero">
+    <div class="hero-icon">🌲</div>
+    <h1 class="hero-title">EcoAcoustic-AI Cihazı</h1>
+    <p class="hero-desc">Yapay zekâ destekli otonom akustik orman koruma sistemi. ESP32, TinyML, LoRa ve gelişmiş sensörlerle donatılmış, güneş enerjisiyle çalışan akıllı cihaz.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-value">%95.9</div><div class="hero-stat-label">Doğruluk</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">15 km</div><div class="hero-stat-label">LoRa Menzil</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">4</div><div class="hero-stat-label">Tehdit Türü</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">7/24</div><div class="hero-stat-label">Çalışma</div></div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .1s;">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div><div class="section-title">Canlı Simülasyon</div><div class="section-subtitle">Ses → AI → LoRa → Web Panel akışını test edin</div></div>
+    </div>
+    <div class="simulation">
+      <div class="sim-flow">
+        <div class="sim-node" id="nodeMic" style="--node-color: #58a6ff; --node-color-soft: rgba(88,166,255,.1); --node-color-glow: rgba(88,166,255,.3);">
+          <div class="sim-node-icon">🎤</div>
+          <div class="sim-node-label">Ses Girişi</div>
+          <div class="sim-node-value" id="valMic">Bekliyor...</div>
+        </div>
+        <div class="sim-arrow" id="arrow1">→</div>
+        <div class="sim-node" id="nodeAI" style="--node-color: #a371f7; --node-color-soft: rgba(163,113,247,.1); --node-color-glow: rgba(163,113,247,.3);">
+          <div class="sim-node-icon">🧠</div>
+          <div class="sim-node-label">TinyML AI</div>
+          <div class="sim-node-value" id="valAI">Bekliyor...</div>
+        </div>
+        <div class="sim-arrow" id="arrow2">→</div>
+        <div class="sim-node" id="nodeLoRa" style="--node-color: #f0b429; --node-color-soft: rgba(240,180,41,.1); --node-color-glow: rgba(240,180,41,.3);">
+          <div class="sim-node-icon">📡</div>
+          <div class="sim-node-label">LoRa TX</div>
+          <div class="sim-node-value" id="valLoRa">Bekliyor...</div>
+        </div>
+        <div class="sim-arrow" id="arrow3">→</div>
+        <div class="sim-node" id="nodePanel" style="--node-color: #2ea043; --node-color-soft: rgba(46,160,67,.1); --node-color-glow: rgba(46,160,67,.3);">
+          <div class="sim-node-icon">🖥️</div>
+          <div class="sim-node-label">OGM Paneli</div>
+          <div class="sim-node-value" id="valPanel">Bekliyor...</div>
+        </div>
+      </div>
+      <div class="sim-controls">
+        <button class="sim-btn fire" id="simFire"><span>🔥</span><span>Yangın Simüle Et</span></button>
+        <button class="sim-btn secondary" id="simChainsaw"><span>🪚</span><span>Testere</span></button>
+        <button class="sim-btn secondary" id="simGunshot"><span>🔫</span><span>Silah</span></button>
+        <button class="sim-btn secondary" id="simTamper"><span>⚠️</span><span>Kurcalama</span></button>
+        <button class="sim-btn secondary" id="simAuto"><span>🤖</span><span>Otomatik Mod</span></button>
+        <button class="sim-btn secondary" id="simReset"><span>🔄</span><span>Sıfırla</span></button>
+      </div>
+      <div class="sim-log" id="simLog">
+        <div class="sim-log-line"><span class="sim-log-time">[SİSTEM]</span><span class="sim-log-msg success">✓ Cihaz hazır. Simülasyon başlatılabilir.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .15s;">
+    <div class="section-header">
+      <div class="section-icon">📜</div>
+      <div><div class="section-title">Simülasyon Geçmişi</div><div class="section-subtitle">Gönderilen son alarmlar</div></div>
+    </div>
+    <div class="history-container" id="historyContainer">
+      <div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-text">Henüz alarm gönderilmedi</div></div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .2s;">
+    <div class="section-header">
+      <div class="section-icon">🔩</div>
+      <div><div class="section-title">Cihaz Görselleştirmesi</div><div class="section-subtitle">Parçalara tıklayarak detaylı bilgi alın</div></div>
+    </div>
+    <div class="device-3d-container">
+      <div class="device-controls">
+        <button class="device-ctrl-btn active" data-rotate="0">👁️ Ön</button>
+        <button class="device-ctrl-btn" data-rotate="90">↻ Sağ</button>
+        <button class="device-ctrl-btn" data-rotate="180">↺ Arka</button>
+      </div>
+      <div class="rotate-hint"><span>💡</span><span>Parçalara tıkla</span></div>
+      <div class="device-scene" id="deviceScene">
+        <div class="antenna"></div>
+        <div class="sound-waves"><div class="sound-wave"></div><div class="sound-wave"></div><div class="sound-wave"></div></div>
+        <div class="device-body">
+          <div class="device-part part-esp32" data-part="esp32"><div class="device-part-icon">🧠</div><div class="device-part-name">ESP32</div></div>
+          <div class="device-part part-inmp441" data-part="inmp441"><div class="device-part-icon">🎤</div><div class="device-part-name">INMP441</div></div>
+          <div class="device-part part-sx1276" data-part="sx1276"><div class="device-part-icon">📡</div><div class="device-part-name">SX1276</div></div>
+          <div class="device-part part-mpu6050" data-part="mpu6050"><div class="device-part-icon">🎚️</div><div class="device-part-name">MPU6050</div></div>
+          <div class="device-part part-battery" data-part="battery"><div class="device-part-icon">🔋</div><div class="device-part-name">BATARYA</div></div>
+          <div class="device-part part-solar" data-part="solar"><div class="device-part-icon">☀️</div><div class="device-part-name">SOLAR PANEL</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .25s;">
+    <div class="section-header">
+      <div class="section-icon">📦</div>
+      <div><div class="section-title">Kullanılan Parçalar</div><div class="section-subtitle">10+ bileşen — detay için tıklayın</div></div>
+    </div>
+    <div class="parts-grid" id="partsGrid"></div>
+  </section>
+
+  <section class="section" style="animation-delay: .3s;">
+    <div class="section-header">
+      <div class="section-icon">🔌</div>
+      <div><div class="section-title">Bağlantı Şeması</div><div class="section-subtitle">ESP32 pin bağlantıları ve protokoller</div></div>
+    </div>
+    <div class="pin-table">
+      <div class="pin-table-header"><div>ESP32 Pin</div><div>Bileşen Pin</div><div>Açıklama</div></div>
+      <div id="pinRows"></div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .35s;">
+    <div class="section-header">
+      <div class="section-icon">📖</div>
+      <div><div class="section-title">Nasıl Çalışır?</div><div class="section-subtitle">4 adımda akustik tehdit tespiti</div></div>
+    </div>
+    <div class="how-grid">
+      <div class="how-step" data-step="1"><div class="how-step-icon">🎤</div><div class="how-step-title">Ses Dinleme</div><div class="how-step-desc">INMP441 dijital I2S mikrofonu ile çevresel sesler saniyede 16.000 kez örneklenir.</div></div>
+      <div class="how-step" data-step="2"><div class="how-step-icon">📊</div><div class="how-step-title">MFE Dönüşümü</div><div class="how-step-desc">Ses sinyalleri MFE algoritması ile spektrogramlara dönüştürülür.</div></div>
+      <div class="how-step" data-step="3"><div class="how-step-icon">🧠</div><div class="how-step-title">TinyML Analizi</div><div class="how-step-desc">ESP32 üzerindeki TinyML modeli, spektrogramı analiz eder. %95.9 doğruluk.</div></div>
+      <div class="how-step" data-step="4"><div class="how-step-icon">📡</div><div class="how-step-title">LoRa İletimi</div><div class="how-step-desc">Tehdit tespit edildiğinde 868 MHz LoRa ile 15 km uzağa alarm gönderilir.</div></div>
+    </div>
+  </section>
+
+  <section class="section" style="animation-delay: .4s;">
+    <div class="section-header">
+      <div class="section-icon">💻</div>
+      <div><div class="section-title">Kod Örnekleri</div><div class="section-subtitle">ESP32 firmware ve sistem kodu</div></div>
+    </div>
+    <div class="code-block">
+      <div class="code-tabs">
+        <button class="code-tab active" data-code="main">main.cpp</button>
+        <button class="code-tab" data-code="lora">LoRa</button>
+        <button class="code-tab" data-code="ai">TinyML</button>
+        <button class="code-tab" data-code="sensor">MPU6050</button>
+      </div>
+      <div class="code-panel active" data-panel="main">
+        <div class="code-content"><span class="cmt">// EcoAcoustic-AI Ana Firmware</span>
+<span class="kw">#include</span> <span class="str">"edge_impulse_model.h"</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="num">115200</span>);
+  <span class="fn">setupLoRa</span>();
+  <span class="fn">setupI2S</span>();
+  <span class="fn">run_classifier_init</span>();
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">captureAudio</span>();
+  <span class="kw">float</span> conf;
+  <span class="kw">int</span> threat = <span class="fn">runInference</span>(audio_buffer, &conf);
+  <span class="kw">if</span> (threat > <span class="num">0</span> && conf > <span class="num">0.85</span>) {
+    <span class="fn">sendAlert</span>(threat, conf);
+  }
+  <span class="fn">delay</span>(<span class="num">100</span>);
+}</div>
+      </div>
+      <div class="code-panel" data-panel="lora">
+        <div class="code-content"><span class="cmt">// LoRa 868 MHz iletişim</span>
+<span class="kw">#define</span> LORA_SS   <span class="num">18</span>
+<span class="kw">#define</span> LORA_RST  <span class="num">14</span>
+<span class="kw">#define</span> LORA_DIO0 <span class="num">26</span>
+
+<span class="kw">void</span> <span class="fn">setupLoRa</span>() {
+  LoRa.<span class="fn">setPins</span>(LORA_SS, LORA_RST, LORA_DIO0);
+  LoRa.<span class="fn">begin</span>(<span class="num">868E6</span>);
+  LoRa.<span class="fn">setSpreadingFactor</span>(<span class="num">7</span>);
+  LoRa.<span class="fn">setSignalBandwidth</span>(<span class="num">125E3</span>);
+  LoRa.<span class="fn">setTxPower</span>(<span class="num">20</span>);
+}
+
+<span class="kw">void</span> <span class="fn">sendAlert</span>(<span class="kw">int</span> type, <span class="kw">float</span> conf) {
+  LoRa.<span class="fn">beginPacket</span>();
+  LoRa.<span class="fn">print</span>(<span class="str">"ECOAI|NODE=ECO-04|"</span>);
+  LoRa.<span class="fn">print</span>(<span class="str">"TYPE="</span>); LoRa.<span class="fn">print</span>(type);
+  LoRa.<span class="fn">print</span>(<span class="str">"|CONF="</span>); LoRa.<span class="fn">print</span>(conf);
+  LoRa.<span class="fn">endPacket</span>();
+}</div>
+      </div>
+      <div class="code-panel" data-panel="ai">
+        <div class="code-content"><span class="cmt">// TinyML çıkarım (Edge Impulse)</span>
+<span class="kw">int</span> <span class="fn">runInference</span>(<span class="kw">float</span>* audio, <span class="kw">float</span>* conf) {
+  signal_t signal;
+  signal.total_length = SAMPLE_BUFFER;
+  signal.<span class="fn">get_data</span> = [](<span class="kw">size_t</span> offset, <span class="kw">size_t</span> length, <span class="kw">float</span>* out) {
+    <span class="fn">memcpy</span>(out, &audio[offset], length * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+    <span class="kw">return</span> <span class="num">0</span>;
+  };
+  ei_impulse_result_t result;
+  <span class="fn">run_classifier</span>(&signal, &result, <span class="kw">false</span>);
+  <span class="kw">int</span> best = <span class="num">0</span>; *conf = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
+    <span class="kw">if</span> (result.classification[i].value > *conf) {
+      *conf = result.classification[i].value;
+      best = i;
+    }
+  }
+  <span class="kw">return</span> best;
+}</div>
+      </div>
+      <div class="code-panel" data-panel="sensor">
+        <div class="code-content"><span class="cmt">// MPU6050 — Sabotaj algılama</span>
+<span class="kw">#include</span> <span class="str">&lt;MPU6050.h&gt;</span>
+
+MPU6050 mpu;
+
+<span class="kw">bool</span> <span class="fn">checkTamper</span>() {
+  <span class="kw">int16_t</span> ax, ay, az;
+  mpu.<span class="fn">getAcceleration</span>(&ax, &ay, &az);
+  <span class="kw">float</span> accel = <span class="fn">sqrt</span>(ax*ax + ay*ay + az*az) / <span class="num">16384.0</span>;
+  <span class="kw">if</span> (accel > <span class="num">2.5</span>) <span class="kw">return true</span>;
+  <span class="kw">if</span> (accel < <span class="num">0.3</span>) <span class="kw">return true</span>;
+  <span class="kw">return false</span>;
+}</div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="modal-backdrop" id="partModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon">🔧</div>
+      <div class="modal-title-wrap"><div class="modal-title" id="modalTitle">Parça Detayı</div><div class="modal-subtitle" id="modalSubtitle">--</div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script>
+const PARTS = {
+  esp32: { icon: '🧠', name: 'ESP32', model: 'ESP32-WROOM-32', color: '#2ea043', colorClass: 'primary', desc: 'Ana işlemci. Çift çekirdekli, WiFi + Bluetooth, TinyML çalıştırır.', specs: { 'Çekirdek': '240 MHz dual-core', 'RAM': '520 KB SRAM', 'Flash': '4 MB', 'WiFi': '802.11 b/g/n', 'Bluetooth': 'BT 4.2 + BLE', 'GPIO': '34 pin', 'Güç': '3.3V — 80mA aktif' }, tags: ['MCU', 'Dual-Core', 'WiFi', 'TinyML'], pins: 'I2S, SPI, I2C, UART' },
+  inmp441: { icon: '🎤', name: 'INMP441', model: 'INMP441 I2S MEMS', color: '#58a6ff', colorClass: 'info', desc: 'Dijital I2S MEMS mikrofon. 16 kHz örnekleme, düşük gürültü.', specs: { 'Tip': 'MEMS Dijital', 'Arayüz': 'I2S', 'SNR': '61 dB', 'Frekans': '60 Hz - 15 kHz', 'Örnekleme': '16 kHz', 'Güç': '1.8V - 3.3V', 'Akım': '1.4 mA' }, tags: ['Ses', 'I2S', 'MEMS', 'Dijital'], pins: 'BCLK, LRCLK, DIN' },
+  sx1276: { icon: '📡', name: 'SX1276', model: 'SX1276 LoRa', color: '#f0b429', colorClass: 'warning', desc: '868 MHz LoRa alıcı-verici. 15 km menzil, düşük güç tüketimi.', specs: { 'Frekans': '868 MHz (TR)', 'Menzil': '15 km', 'Modülasyon': 'LoRa / FSK', 'Güç': '20 dBm (max)', 'Hassasiyet': '-148 dBm', 'Arayüz': 'SPI', 'Akım': '120 mA TX' }, tags: ['LoRa', '868 MHz', 'SPI', 'Uzun Menzil'], pins: 'SCK, MISO, MOSI, NSS, RST, DIO0' },
+  mpu6050: { icon: '🎚️', name: 'MPU6050', model: 'MPU6050 6-Eksen', color: '#a371f7', colorClass: 'purple', desc: '6 eksenli ivmeölçer + jiroskop. Kurcalama ve devrilme algılar.', specs: { 'Eksen': '3 ivme + 3 jiro', 'Arayüz': 'I2C', 'Hassasiyet': '±16g', 'Jiro': '±2000°/s', 'Çözünürlük': '16-bit', 'Güç': '3.3V', 'Akım': '3.9 mA' }, tags: ['İvmeölçer', 'Jiroskop', 'I2C', '6-Eksen'], pins: 'SDA, SCL' },
+  battery: { icon: '🔋', name: 'Batarya', model: '18650 Li-ion', color: '#f85149', colorClass: 'danger', desc: 'Yeniden şarj edilebilir lityum-iyon batarya. 5+ gün yedek.', specs: { 'Kapasite': '2000 mAh', 'Voltaj': '3.7V', 'Tip': '18650', 'Şarj': '500+ döngü', 'Yedek': '5+ gün', 'Boyut': '18 × 65 mm', 'Ağırlık': '45g' }, tags: ['Güç', 'Li-ion', 'Şarj Edilebilir'], pins: '+, -' },
+  solar: { icon: '☀️', name: 'Güneş Paneli', model: '6V / 1W Monokristal', color: '#3fb950', colorClass: 'primary', desc: 'Güneş enerjisi hasadı. Cihazın sürekli çalışmasını sağlar.', specs: { 'Güç': '1 W', 'Voltaj': '6V', 'Akım': '166 mA', 'Hücre': 'Monokristal', 'Verim': '%18-22', 'Boyut': '110 × 60 mm', 'Ömür': '20+ yıl' }, tags: ['Solar', 'Enerji', 'Otonom'], pins: '+, -' },
+  dht22: { icon: '🌡️', name: 'DHT22', model: 'DHT22 Sıcaklık/Nem', color: '#ff6b35', colorClass: 'danger', desc: 'Sıcaklık ve nem sensörü. Yangın riski hesaplaması için.', specs: { 'Sıcaklık': '-40°C ~ +80°C', 'Hassasiyet': '±0.5°C', 'Nem': '%0-100', 'Çözünürlük': '16-bit', 'Arayüz': 'Tek kablo', 'Örnekleme': '0.5 Hz', 'Akım': '1.5 mA' }, tags: ['Sıcaklık', 'Nem', 'Yangın'], pins: 'DATA' },
+  mq2: { icon: '💨', name: 'MQ-2', model: 'MQ-2 Duman Sensörü', color: '#d29922', colorClass: 'warning', desc: 'Duman ve yanıcı gaz sensörü. Erken yangın uyarısı.', specs: { 'Gaz': 'LPG, Metan, Duman', 'Algılama': '300-10000 ppm', 'Isınma': '< 24 saat', 'Voltaj': '5V', 'Akım': '150 mA', 'Çıkış': 'Analog', 'Ömür': '5+ yıl' }, tags: ['Duman', 'Gaz', 'Analog'], pins: 'AOUT, DOUT' },
+  irflame: { icon: '🔥', name: 'IR Flame', model: 'IR Alev Sensörü', color: '#e5484d', colorClass: 'danger', desc: 'Kızılötesi alev dedektörü. Anlık yangın algılama.', specs: { 'Dalga Boyu': '760-1100 nm', 'Açı': '60°', 'Mesafe': '20-100 cm', 'Yanıt': '< 100 ms', 'Voltaj': '3.3V - 5V', 'Akım': '15 mA', 'Çıkış': 'Analog + Dijital' }, tags: ['Alev', 'IR', 'Hızlı'], pins: 'AOUT, DOUT' },
+  fuse: { icon: '⚡', name: 'Sigorta', model: 'PTC Resetlenebilir', color: '#58a6ff', colorClass: 'info', desc: 'Aşırı akım koruması. Elektronik bileşenleri korur.', specs: { 'Akım': '500 mA', 'Voltaj': '6V', 'Tip': 'PTC Polimer', 'Yanıt': '< 1 sn', 'Reset': 'Otomatik', 'Ömür': '1000+ kez' }, tags: ['Koruma', 'PTC', 'Güvenlik'], pins: '+, -' }
+};
+const PIN_CONNECTIONS = [
+  { esp: 'GPIO 25', comp: 'INMP441 WS', desc: 'I2S Word Select (LRCLK)' },
+  { esp: 'GPIO 26', comp: 'INMP441 SD', desc: 'I2S Data (DIN)' },
+  { esp: 'GPIO 27', comp: 'INMP441 SCK', desc: 'I2S Bit Clock (BCLK)' },
+  { esp: 'GPIO 18', comp: 'SX1276 NSS', desc: 'LoRa Chip Select (SPI)' },
+  { esp: 'GPIO 23', comp: 'SX1276 MOSI', desc: 'SPI Master Out' },
+  { esp: 'GPIO 19', comp: 'SX1276 MISO', desc: 'SPI Master In' },
+  { esp: 'GPIO 5', comp: 'SX1276 SCK', desc: 'SPI Clock' },
+  { esp: 'GPIO 14', comp: 'SX1276 RST', desc: 'LoRa Reset' },
+  { esp: 'GPIO 26', comp: 'SX1276 DIO0', desc: 'LoRa Interrupt' },
+  { esp: 'GPIO 21', comp: 'MPU6050 SDA', desc: 'I2C Data' },
+  { esp: 'GPIO 22', comp: 'MPU6050 SCL', desc: 'I2C Clock' },
+  { esp: 'GPIO 4', comp: 'DHT22 DATA', desc: 'Sıcaklık/Nem Data' },
+  { esp: 'GPIO 34', comp: 'MQ-2 AOUT', desc: 'Duman Analog Giriş' },
+  { esp: 'GPIO 35', comp: 'IR Flame AOUT', desc: 'Alev Analog Giriş' },
+  { esp: '3.3V', comp: 'Tüm Sensörler', desc: 'Güç hattı' },
+  { esp: 'GND', comp: 'Tüm Bileşenler', desc: 'Toprak hattı' }
+];
+const THREATS = {
+  fire: { icon: '🔥', name: 'Yangın Çıtırtısı', color: '#ff6b35', conf: [85, 96] },
+  chainsaw: { icon: '🪚', name: 'Motorlu Testere', color: '#f0b429', conf: [88, 97] },
+  gunshot: { icon: '🔫', name: 'Silah Sesi', color: '#e5484d', conf: [90, 99] },
+  tamper: { icon: '⚠️', name: 'Kurcalama', color: '#a371f7', conf: [95, 100] }
+};
+const NODE_POSITIONS = [
+  { id: 'ECO-01', lat: 39.9043, lon: 41.2679, name: 'Erzurum Merkez' },
+  { id: 'ECO-02', lat: 39.8456, lon: 41.3456, name: 'Palandöken Ormanı' },
+  { id: 'ECO-03', lat: 40.0123, lon: 41.4567, name: 'Tortum Şelalesi' },
+  { id: 'ECO-04', lat: 40.2345, lon: 42.1234, name: 'Şenkaya Ormanı' },
+  { id: 'ECO-05', lat: 39.7567, lon: 41.1234, name: 'Ilıca Ormanı' },
+  { id: 'ECO-06', lat: 40.1234, lon: 41.6789, name: 'Uzundere Vadisi' },
+  { id: 'ECO-07', lat: 39.9821, lon: 41.3865, name: 'Palandöken Zirve' },
+  { id: 'ECO-08', lat: 40.3456, lon: 41.2345, name: 'Narman Ormanı' }
+];
+let simRunning = false;
+let autoMode = false;
+let autoInterval = null;
+let sendCount = parseInt(localStorage.getItem('ecoacoustic_send_count') || '0');
+let history = JSON.parse(localStorage.getItem('ecoacoustic_sim_history') || '[]');
+class ToastManager {
+  constructor() { this.container = document.getElementById('toastContainer'); }
+  show(msg, type = 'info', duration = 4000) {
+    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<div class="toast-icon">${icons[type]}</div><div class="toast-text">${msg}</div>`;
+    this.container.appendChild(toast);
+    setTimeout(() => { toast.style.animation = 'slideInRight .3s reverse'; setTimeout(() => toast.remove(), 300); }, duration);
+  }
+}
+const toast = new ToastManager();
+function log(msg, type = 'info') {
+  const log = document.getElementById('simLog');
+  const time = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const line = document.createElement('div');
+  line.className = 'sim-log-line';
+  line.innerHTML = `<span class="sim-log-time">[${time}]</span><span class="sim-log-msg ${type}">${msg}</span>`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+function setNodeActive(id, active) { const el = document.getElementById(id); if (el) el.classList.toggle('active', active); }
+function setArrowActive(id, active) { const el = document.getElementById(id); if (el) el.classList.toggle('active', active); }
+function setValue(id, text, active = false) { const el = document.getElementById(id); if (el) { el.textContent = text; el.classList.toggle('active', active); } }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sendAlertToPanel(threatKey) {
+  const t = THREATS[threatKey];
+  const conf = (t.conf[0] + Math.random() * (t.conf[1] - t.conf[0])).toFixed(1);
+  const node = NODE_POSITIONS[Math.floor(Math.random() * NODE_POSITIONS.length)];
+  const alert = {
+    id: `SIM-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+    nodeId: node.id,
+    nodeName: node.name,
+    threatType: threatKey,
+    threatLabel: t.name,
+    icon: t.icon,
+    color: t.color,
+    confidence: parseFloat(conf) / 100,
+    latitude: node.lat + (Math.random() - 0.5) * 0.008,
+    longitude: node.lon + (Math.random() - 0.5) * 0.008,
+    battery: 3.3 + Math.random() * 0.8,
+    rssi: -60 - Math.floor(Math.random() * 35),
+    temperature: 15 + Math.random() * 20,
+    timestamp: new Date().toISOString(),
+    severity: parseFloat(conf) > 93 ? 'high' : parseFloat(conf) > 88 ? 'med' : 'low',
+    source: 'simulation'
+  };
+  const existing = JSON.parse(localStorage.getItem('ecoacoustic_alerts') || '[]');
+  existing.unshift(alert);
+  if (existing.length > 500) existing.pop();
+  localStorage.setItem('ecoacoustic_alerts', JSON.stringify(existing));
+  localStorage.setItem('ecoacoustic_last_alert', JSON.stringify({ id: alert.id, timestamp: Date.now(), source: 'cihaz.html' }));
+  sendCount++;
+  localStorage.setItem('ecoacoustic_send_count', sendCount.toString());
+  updateSendCount();
+  history.unshift({ id: alert.id, icon: alert.icon, threatLabel: alert.threatLabel, threatType: alert.threatType, nodeId: alert.nodeId, nodeName: alert.nodeName, confidence: alert.confidence, timestamp: alert.timestamp });
+  if (history.length > 50) history.pop();
+  localStorage.setItem('ecoacoustic_sim_history', JSON.stringify(history));
+  renderHistory();
+  console.log('📤 Alarm gönderildi:', alert.threatLabel, alert.nodeId);
+  return alert;
+}
+function updateSendCount() { document.getElementById('sendCount').textContent = `📤 ${sendCount} alarm gönderildi`; }
+async function runSimulation(threatKey) {
+  if (simRunning) return;
+  simRunning = true;
+  const t = THREATS[threatKey];
+  const conf = (t.conf[0] + Math.random() * (t.conf[1] - t.conf[0])).toFixed(1);
+  document.querySelectorAll('.sim-btn').forEach(b => b.disabled = true);
+  ['nodeMic', 'nodeAI', 'nodeLoRa', 'nodePanel'].forEach(id => setNodeActive(id, false));
+  ['arrow1', 'arrow2', 'arrow3'].forEach(id => setArrowActive(id, false));
+  setNodeActive('nodeMic', true);
+  setValue('valMic', `${t.name} algılandı`, true);
+  log(`🎤 Mikrofon ses yakaladı: ${t.name}`, 'info');
+  await sleep(1200);
+  setArrowActive('arrow1', true);
+  await sleep(300);
+  setNodeActive('nodeAI', true);
+  setValue('valAI', `%${conf} güven`, true);
+  log(`🧠 TinyML analizi: %${conf} doğrulukla ${t.name}`, 'success');
+  await sleep(1200);
+  setArrowActive('arrow2', true);
+  await sleep(300);
+  setNodeActive('nodeLoRa', true);
+  setValue('valLoRa', 'Paket gönderiliyor...', true);
+  log(`📡 LoRa TX: 868 MHz paket gönderiliyor...`, 'info');
+  await sleep(1000);
+  setValue('valLoRa', '✓ İletildi', true);
+  log(`✓ Paket iletildi (RSSI: -${Math.floor(Math.random() * 30 + 60)} dBm)`, 'success');
+  await sleep(800);
+  setArrowActive('arrow3', true);
+  await sleep(300);
+  setNodeActive('nodePanel', true);
+  setValue('valPanel', 'Alarm kaydedildi', true);
+  log(`🖥️ OGM Paneli: ${t.icon} ${t.name} alarmı kaydedildi`, 'success');
+  await sleep(500);
+  const alert = sendAlertToPanel(threatKey);
+  log(`📤 index.html paneline gönderildi: ${alert.nodeId} — ${alert.confidence.toFixed(2)}`, 'success');
+  const parts = ['esp32', 'inmp441', 'sx1276'];
+  for (const p of parts) {
+    const el = document.querySelector(`[data-part="${p}"]`);
+    if (el) { el.classList.add('sending'); setTimeout(() => el.classList.remove('sending'), 1500); }
+  }
+  toast.show(`${t.icon} ${t.name} → Panele gönderildi`, threatKey === 'fire' ? 'error' : 'warning', 4000);
+  log(`✅ Simülasyon tamamlandı.`, 'success');
+  simRunning = false;
+  if (!autoMode) document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+}
+function toggleAutoMode() {
+  autoMode = !autoMode;
+  const btn = document.getElementById('simAuto');
+  if (autoMode) {
+    btn.classList.add('active');
+    btn.innerHTML = '<span>⏸️</span><span>Durdur</span>';
+    log('🤖 Otomatik mod AÇIK — Her 8 saniyede rastgele alarm', 'warning');
+    toast.show('🤖 Otomatik mod başlatıldı', 'warning', 3000);
+    const types = Object.keys(THREATS);
+    runSimulation(types[Math.floor(Math.random() * types.length)]);
+    autoInterval = setInterval(() => {
+      const types = Object.keys(THREATS);
+      runSimulation(types[Math.floor(Math.random() * types.length)]);
+    }, 8000);
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '<span>🤖</span><span>Otomatik Mod</span>';
+    log('🤖 Otomatik mod KAPALI', 'info');
+    toast.show('⏹️ Otomatik mod durduruldu', 'info', 3000);
+    if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+    document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+  }
+}
+function resetSim() {
+  ['nodeMic', 'nodeAI', 'nodeLoRa', 'nodePanel'].forEach(id => setNodeActive(id, false));
+  ['arrow1', 'arrow2', 'arrow3'].forEach(id => setArrowActive(id, false));
+  setValue('valMic', 'Bekliyor...');
+  setValue('valAI', 'Bekliyor...');
+  setValue('valLoRa', 'Bekliyor...');
+  setValue('valPanel', 'Bekliyor...');
+  const log = document.getElementById('simLog');
+  log.innerHTML = `<div class="sim-log-line"><span class="sim-log-time">[SİSTEM]</span><span class="sim-log-msg success">✓ Simülasyon sıfırlandı.</span></div>`;
+  simRunning = false;
+  document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+}
+function resetAll() {
+  if (!confirm('Tüm geçmiş ve gönderim sayısı sıfırlanacak. Emin misiniz?')) return;
+  if (autoMode) toggleAutoMode();
+  resetSim();
+  sendCount = 0;
+  history = [];
+  localStorage.removeItem('ecoacoustic_send_count');
+  localStorage.removeItem('ecoacoustic_sim_history');
+  localStorage.removeItem('ecoacoustic_alerts');
+  localStorage.removeItem('ecoacoustic_last_alert');
+  updateSendCount();
+  renderHistory();
+  toast.show('🔄 Tüm veriler sıfırlandı', 'success');
+  log('🔄 Sistem tamamen sıfırlandı', 'warning');
+}
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
+  if (history.length === 0) {
+    container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-text">Henüz alarm gönderilmedi</div></div>`;
+    return;
+  }
+  container.innerHTML = history.map(h => {
+    const time = new Date(h.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const conf = (h.confidence * 100).toFixed(0);
+    return `<div class="history-item"><div class="history-icon" style="color: ${THREATS[h.threatType]?.color || '#2ea043'};">${h.icon}</div><div class="history-content"><div class="history-title">${h.threatLabel}</div><div class="history-meta"><span>📡 ${h.nodeId}</span><span>📍 ${h.nodeName}</span><span>🕐 ${time}</span></div></div><div class="history-badge">${conf}%</div></div>`;
+  }).join('');
+}
+function checkPanelConnection() {
+  const panelStatus = document.getElementById('panelStatus');
+  const panelBadge = document.getElementById('panelBadge');
+  const isSameOrigin = window.location.origin.includes('github.io') || window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+  if (isSameOrigin) {
+    panelStatus.textContent = 'Hazır (index.html açabilirsin)';
+    panelBadge.classList.remove('disconnected');
+    panelBadge.classList.add('connected');
+    panelBadge.innerHTML = '<span>🔗</span><span>Bağlantı Aktif</span>';
+  } else {
+    panelStatus.textContent = 'Farklı origin';
+    panelBadge.classList.remove('connected');
+    panelBadge.classList.add('disconnected');
+    panelBadge.innerHTML = '<span>⚠️</span><span>Origin Uyuşmuyor</span>';
+  }
+}
+function renderParts() {
+  const grid = document.getElementById('partsGrid');
+  grid.innerHTML = Object.entries(PARTS).map(([key, p], i) => `<div class="part-card" data-part="${key}" style="--part-color: ${p.color}; --part-color-glow: ${p.color}44; animation-delay: ${i * 0.05}s;"><div class="part-card-header"><div class="part-card-icon">${p.icon}</div><div class="part-card-info"><div class="part-card-name">${p.name}</div><div class="part-card-model">${p.model}</div></div></div><div class="part-card-desc">${p.desc}</div><div class="part-card-tags">${p.tags.map(t => `<span class="part-tag ${p.colorClass}">${t}</span>`).join('')}</div></div>`).join('');
+  grid.querySelectorAll('.part-card').forEach(card => { card.addEventListener('click', () => showPartDetail(card.dataset.part)); });
+}
+function renderPins() {
+  document.getElementById('pinRows').innerHTML = PIN_CONNECTIONS.map(p => `<div class="pin-row"><div class="pin-esp">${p.esp}</div><div class="pin-component">${p.comp}</div><div class="pin-desc">${p.desc}</div></div>`).join('');
+}
+function showPartDetail(partKey) {
+  const p = PARTS[partKey];
+  if (!p) return;
+  document.getElementById('modalIcon').textContent = p.icon;
+  document.getElementById('modalTitle').textContent = p.name;
+  document.getElementById('modalSubtitle').textContent = p.model;
+  document.getElementById('modalBody').innerHTML = `<div class="modal-section"><div class="modal-section-title">📋 Açıklama</div><div class="modal-desc">${p.desc}</div></div><div class="modal-section"><div class="modal-section-title">⚙️ Teknik Özellikler</div><div class="modal-grid">${Object.entries(p.specs).map(([k, v]) => `<div class="modal-grid-item"><div class="modal-grid-label">${k}</div><div class="modal-grid-value">${v}</div></div>`).join('')}</div></div><div class="modal-section"><div class="modal-section-title">🔌 Pin Bağlantıları</div><div class="modal-desc">${p.pins}</div></div><div class="modal-section"><div class="modal-section-title">🏷️ Etiketler</div><div class="part-card-tags" style="gap: 6px;">${p.tags.map(t => `<span class="part-tag ${p.colorClass}">${t}</span>`).join('')}</div></div>`;
+  document.getElementById('partModal').classList.add('show');
+}
+function closeModal() { document.getElementById('partModal').classList.remove('show'); }
+document.getElementById('partModal').addEventListener('click', (e) => { if (e.target.id === 'partModal') closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+function bindDeviceParts() {
+  document.querySelectorAll('.device-part').forEach(el => {
+    el.addEventListener('click', () => {
+      const part = el.dataset.part;
+      showPartDetail(part);
+      document.querySelectorAll('.device-part').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      setTimeout(() => el.classList.remove('active'), 2000);
+    });
+  });
+}
+function bindDeviceRotate() {
+  document.querySelectorAll('.device-ctrl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.device-ctrl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const deg = parseInt(btn.dataset.rotate);
+      document.getElementById('deviceScene').style.transform = `rotateX(-8deg) rotateY(${deg}deg)`;
+    });
+  });
+}
+function bindCodeTabs() {
+  document.querySelectorAll('.code-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.code-panel[data-panel="${tab.dataset.code}"]`).classList.add('active');
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  renderParts();
+  renderPins();
+  renderHistory();
+  updateSendCount();
+  bindDeviceParts();
+  bindDeviceRotate();
+  bindCodeTabs();
+  checkPanelConnection();
+  document.getElementById('simFire').addEventListener('click', () => runSimulation('fire'));
+  document.getElementById('simChainsaw').addEventListener('click', () => runSimulation('chainsaw'));
+  document.getElementById('simGunshot').addEventListener('click', () => runSimulation('gunshot'));
+  document.getElementById('simTamper').addEventListener('click', () => runSimulation('tamper'));
+  document.getElementById('simAuto').addEventListener('click', toggleAutoMode);
+  document.getElementById('simReset').addEventListener('click', resetSim);
+  window.addEventListener('beforeunload', () => { if (autoInterval) clearInterval(autoInterval); });
+  console.log('%c🔧 EcoAcoustic-AI Cihaz Simülasyonu hazır', 'color:#2ea043;font-size:14px;font-weight:800;');
+});
+</script>
+</body>
+</html>
