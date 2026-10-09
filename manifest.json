@@ -1,0 +1,45 @@
+{
+  "name": "EcoAcoustic-AI — OGM Komuta Merkezi",
+  "short_name": "EcoAcoustic",
+  "description": "Yapay Zekâ Destekli Otonom Akustik Orman Koruma ve Erken Uyarı Sistemi",
+  "start_url": "/Teknokent-proje/",
+  "scope": "/Teknokent-proje/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#2ea043",
+  "lang": "tr-TR",
+  "dir": "ltr",
+  "categories": ["utilities", "productivity", "government"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Alarmlar",
+      "short_name": "Alarmlar",
+      "description": "Son alarmları görüntüle",
+      "url": "/Teknokent-proje/?page=alerts",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Harita",
+      "short_name": "Harita",
+      "description": "Canlı tehdit haritası",
+      "url": "/Teknokent-proje/?page=dashboard",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
