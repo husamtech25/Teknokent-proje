@@ -613,6 +613,774 @@ body > * { position: relative; z-index: 1; }
       </div>
     </div>
   </section>
+    <!-- 3D CİHAZ (Mevcut) -->
+  <section class="section" style="animation-delay: .35s;">
+    <div class="section-header">
+      <div class="section-icon">🔩</div>
+      <div>
+        <div class="section-title">Cihaz Görselleştirmesi</div>
+        <div class="section-subtitle">Parçalara tıklayarak detaylı bilgi alın</div>
+      </div>
+    </div>
+    <div class="device-3d-container">
+      <div class="device-controls">
+        <button class="device-ctrl-btn active" data-rotate="0">👁️ Ön</button>
+        <button class="device-ctrl-btn" data-rotate="90">↻ Sağ</button>
+        <button class="device-ctrl-btn" data-rotate="180">↺ Arka</button>
+      </div>
+      <div class="rotate-hint"><span>💡</span><span>Parçalara tıkla</span></div>
+      <div class="device-scene" id="deviceScene">
+        <div class="antenna"></div>
+        <div class="sound-waves"><div class="sound-wave"></div><div class="sound-wave"></div><div class="sound-wave"></div></div>
+        <div class="device-body">
+          <div class="device-part part-esp32" data-part="esp32"><div class="device-part-icon">🧠</div><div class="device-part-name">ESP32</div></div>
+          <div class="device-part part-inmp441" data-part="inmp441"><div class="device-part-icon">🎤</div><div class="device-part-name">INMP441</div></div>
+          <div class="device-part part-sx1276" data-part="sx1276"><div class="device-part-icon">📡</div><div class="device-part-name">SX1276</div></div>
+          <div class="device-part part-mpu6050" data-part="mpu6050"><div class="device-part-icon">🎚️</div><div class="device-part-name">MPU6050</div></div>
+          <div class="device-part part-battery" data-part="battery"><div class="device-part-icon">🔋</div><div class="device-part-name">BATARYA</div></div>
+          <div class="device-part part-solar" data-part="solar"><div class="device-part-icon">☀️</div><div class="device-part-name">SOLAR PANEL</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARÇALAR (Mevcut) -->
+  <section class="section" style="animation-delay: .4s;">
+    <div class="section-header">
+      <div class="section-icon">📦</div>
+      <div>
+        <div class="section-title">Kullanılan Parçalar</div>
+        <div class="section-subtitle">10+ bileşen — detay için tıklayın</div>
+      </div>
+    </div>
+    <div class="parts-grid" id="partsGrid"></div>
+  </section>
+
+  <!-- PIN BAĞLANTILARI (Mevcut) -->
+  <section class="section" style="animation-delay: .45s;">
+    <div class="section-header">
+      <div class="section-icon">🔌</div>
+      <div>
+        <div class="section-title">Bağlantı Şeması</div>
+        <div class="section-subtitle">ESP32 pin bağlantıları ve protokoller</div>
+      </div>
+    </div>
+    <div class="pin-table">
+      <div class="pin-table-header"><div>ESP32 Pin</div><div>Bileşen Pin</div><div>Açıklama</div></div>
+      <div id="pinRows"></div>
+    </div>
+  </section>
+
+  <!-- NASIL ÇALIŞIR (Mevcut) -->
+  <section class="section" style="animation-delay: .5s;">
+    <div class="section-header">
+      <div class="section-icon">📖</div>
+      <div>
+        <div class="section-title">Nasıl Çalışır?</div>
+        <div class="section-subtitle">4 adımda akustik tehdit tespiti</div>
+      </div>
+    </div>
+    <div class="how-grid">
+      <div class="how-step" data-step="1"><div class="how-step-icon">🎤</div><div class="how-step-title">Ses Dinleme</div><div class="how-step-desc">INMP441 dijital I2S mikrofonu ile çevresel sesler saniyede 16.000 kez örneklenir.</div></div>
+      <div class="how-step" data-step="2"><div class="how-step-icon">📊</div><div class="how-step-title">MFE Dönüşümü</div><div class="how-step-desc">Ses sinyalleri MFE algoritması ile spektrogramlara dönüştürülür.</div></div>
+      <div class="how-step" data-step="3"><div class="how-step-icon">🧠</div><div class="how-step-title">TinyML Analizi</div><div class="how-step-desc">ESP32 üzerindeki TinyML modeli, spektrogramı analiz eder. %95.9 doğruluk.</div></div>
+      <div class="how-step" data-step="4"><div class="how-step-icon">📡</div><div class="how-step-title">LoRa İletimi</div><div class="how-step-desc">Tehdit tespit edildiğinde 868 MHz LoRa ile 15 km uzağa alarm gönderilir.</div></div>
+    </div>
+  </section>
+
+  <!-- KOD ÖRNEKLERİ (Mevcut) -->
+  <section class="section" style="animation-delay: .55s;">
+    <div class="section-header">
+      <div class="section-icon">💻</div>
+      <div>
+        <div class="section-title">Kod Örnekleri</div>
+        <div class="section-subtitle">ESP32 firmware ve sistem kodu</div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-tabs">
+        <button class="code-tab active" data-code="main">main.cpp</button>
+        <button class="code-tab" data-code="lora">LoRa</button>
+        <button class="code-tab" data-code="ai">TinyML</button>
+        <button class="code-tab" data-code="sensor">MPU6050</button>
+      </div>
+      <div class="code-panel active" data-panel="main">
+        <div class="code-content"><span class="cmt">// EcoAcoustic-AI Ana Firmware</span>
+<span class="kw">#include</span> <span class="str">"edge_impulse_model.h"</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="num">115200</span>);
+  <span class="fn">setupLoRa</span>();
+  <span class="fn">setupI2S</span>();
+  <span class="fn">run_classifier_init</span>();
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">captureAudio</span>();
+  <span class="kw">float</span> conf;
+  <span class="kw">int</span> threat = <span class="fn">runInference</span>(audio_buffer, &conf);
+  <span class="kw">if</span> (threat > <span class="num">0</span> && conf > <span class="num">0.85</span>) {
+    <span class="fn">sendAlert</span>(threat, conf);
+  }
+  <span class="fn">delay</span>(<span class="num">100</span>);
+}</div>
+      </div>
+      <div class="code-panel" data-panel="lora">
+        <div class="code-content"><span class="cmt">// LoRa 868 MHz iletişim</span>
+<span class="kw">#define</span> LORA_SS   <span class="num">18</span>
+<span class="kw">#define</span> LORA_RST  <span class="num">14</span>
+<span class="kw">#define</span> LORA_DIO0 <span class="num">26</span>
+
+<span class="kw">void</span> <span class="fn">setupLoRa</span>() {
+  LoRa.<span class="fn">setPins</span>(LORA_SS, LORA_RST, LORA_DIO0);
+  LoRa.<span class="fn">begin</span>(<span class="num">868E6</span>);
+  LoRa.<span class="fn">setSpreadingFactor</span>(<span class="num">7</span>);
+  LoRa.<span class="fn">setSignalBandwidth</span>(<span class="num">125E3</span>);
+  LoRa.<span class="fn">setTxPower</span>(<span class="num">20</span>);
+}
+
+<span class="kw">void</span> <span class="fn">sendAlert</span>(<span class="kw">int</span> type, <span class="kw">float</span> conf) {
+  LoRa.<span class="fn">beginPacket</span>();
+  LoRa.<span class="fn">print</span>(<span class="str">"ECOAI|NODE=ECO-04|"</span>);
+  LoRa.<span class="fn">print</span>(<span class="str">"TYPE="</span>); LoRa.<span class="fn">print</span>(type);
+  LoRa.<span class="fn">print</span>(<span class="str">"|CONF="</span>); LoRa.<span class="fn">print</span>(conf);
+  LoRa.<span class="fn">endPacket</span>();
+}</div>
+      </div>
+      <div class="code-panel" data-panel="ai">
+        <div class="code-content"><span class="cmt">// TinyML çıkarım (Edge Impulse)</span>
+<span class="kw">int</span> <span class="fn">runInference</span>(<span class="kw">float</span>* audio, <span class="kw">float</span>* conf) {
+  signal_t signal;
+  signal.total_length = SAMPLE_BUFFER;
+  signal.<span class="fn">get_data</span> = [](<span class="kw">size_t</span> offset, <span class="kw">size_t</span> length, <span class="kw">float</span>* out) {
+    <span class="fn">memcpy</span>(out, &audio[offset], length * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+    <span class="kw">return</span> <span class="num">0</span>;
+  };
+  ei_impulse_result_t result;
+  <span class="fn">run_classifier</span>(&signal, &result, <span class="kw">false</span>);
+  <span class="kw">int</span> best = <span class="num">0</span>; *conf = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
+    <span class="kw">if</span> (result.classification[i].value > *conf) {
+      *conf = result.classification[i].value;
+      best = i;
+    }
+  }
+  <span class="kw">return</span> best;
+}</div>
+      </div>
+      <div class="code-panel" data-panel="sensor">
+        <div class="code-content"><span class="cmt">// MPU6050 — Sabotaj algılama</span>
+<span class="kw">#include</span> <span class="str">&lt;MPU6050.h&gt;</span>
+
+MPU6050 mpu;
+
+<span class="kw">bool</span> <span class="fn">checkTamper</span>() {
+  <span class="kw">int16_t</span> ax, ay, az;
+  mpu.<span class="fn">getAcceleration</span>(&ax, &ay, &az);
+  <span class="kw">float</span> accel = <span class="fn">sqrt</span>(ax*ax + ay*ay + az*az) / <span class="num">16384.0</span>;
+  <span class="kw">if</span> (accel > <span class="num">2.5</span>) <span class="kw">return true</span>;
+  <span class="kw">if</span> (accel < <span class="num">0.3</span>) <span class="kw">return true</span>;
+  <span class="kw">return false</span>;
+}</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="partModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon">🔧</div>
+      <div class="modal-title-wrap"><div class="modal-title" id="modalTitle">Parça Detayı</div><div class="modal-subtitle" id="modalSubtitle">--</div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// 📦 PARÇA VERİTABANI
+// ============================================================
+const PARTS = {
+  esp32: { icon: '🧠', name: 'ESP32', model: 'ESP32-WROOM-32', color: '#2ea043', colorClass: 'primary', desc: 'Ana işlemci. Çift çekirdekli, WiFi + Bluetooth, TinyML çalıştırır.', specs: { 'Çekirdek': '240 MHz dual-core', 'RAM': '520 KB SRAM', 'Flash': '4 MB', 'WiFi': '802.11 b/g/n', 'Bluetooth': 'BT 4.2 + BLE', 'GPIO': '34 pin', 'Güç': '3.3V — 80mA aktif' }, tags: ['MCU', 'Dual-Core', 'WiFi', 'TinyML'], pins: 'I2S, SPI, I2C, UART' },
+  inmp441: { icon: '🎤', name: 'INMP441', model: 'INMP441 I2S MEMS', color: '#58a6ff', colorClass: 'info', desc: 'Dijital I2S MEMS mikrofon. 16 kHz örnekleme, düşük gürültü.', specs: { 'Tip': 'MEMS Dijital', 'Arayüz': 'I2S', 'SNR': '61 dB', 'Frekans': '60 Hz - 15 kHz', 'Örnekleme': '16 kHz', 'Güç': '1.8V - 3.3V', 'Akım': '1.4 mA' }, tags: ['Ses', 'I2S', 'MEMS', 'Dijital'], pins: 'BCLK, LRCLK, DIN' },
+  sx1276: { icon: '📡', name: 'SX1276', model: 'SX1276 LoRa', color: '#f0b429', colorClass: 'warning', desc: '868 MHz LoRa alıcı-verici. 15 km menzil, düşük güç tüketimi.', specs: { 'Frekans': '868 MHz (TR)', 'Menzil': '15 km', 'Modülasyon': 'LoRa / FSK', 'Güç': '20 dBm (max)', 'Hassasiyet': '-148 dBm', 'Arayüz': 'SPI', 'Akım': '120 mA TX' }, tags: ['LoRa', '868 MHz', 'SPI', 'Uzun Menzil'], pins: 'SCK, MISO, MOSI, NSS, RST, DIO0' },
+  mpu6050: { icon: '🎚️', name: 'MPU6050', model: 'MPU6050 6-Eksen', color: '#a371f7', colorClass: 'purple', desc: '6 eksenli ivmeölçer + jiroskop. Kurcalama ve devrilme algılar.', specs: { 'Eksen': '3 ivme + 3 jiro', 'Arayüz': 'I2C', 'Hassasiyet': '±16g', 'Jiro': '±2000°/s', 'Çözünürlük': '16-bit', 'Güç': '3.3V', 'Akım': '3.9 mA' }, tags: ['İvmeölçer', 'Jiroskop', 'I2C', '6-Eksen'], pins: 'SDA, SCL' },
+  battery: { icon: '🔋', name: 'Batarya', model: '18650 Li-ion', color: '#f85149', colorClass: 'danger', desc: 'Yeniden şarj edilebilir lityum-iyon batarya. 5+ gün yedek.', specs: { 'Kapasite': '2000 mAh', 'Voltaj': '3.7V', 'Tip': '18650', 'Şarj': '500+ döngü', 'Yedek': '5+ gün', 'Boyut': '18 × 65 mm', 'Ağırlık': '45g' }, tags: ['Güç', 'Li-ion', 'Şarj Edilebilir'], pins: '+, -' },
+  solar: { icon: '☀️', name: 'Güneş Paneli', model: '6V / 1W Monokristal', color: '#3fb950', colorClass: 'primary', desc: 'Güneş enerjisi hasadı. Cihazın sürekli çalışmasını sağlar.', specs: { 'Güç': '1 W', 'Voltaj': '6V', 'Akım': '166 mA', 'Hücre': 'Monokristal', 'Verim': '%18-22', 'Boyut': '110 × 60 mm', 'Ömür': '20+ yıl' }, tags: ['Solar', 'Enerji', 'Otonom'], pins: '+, -' },
+  dht22: { icon: '🌡️', name: 'DHT22', model: 'DHT22 Sıcaklık/Nem', color: '#ff6b35', colorClass: 'danger', desc: 'Sıcaklık ve nem sensörü. Yangın riski hesaplaması için.', specs: { 'Sıcaklık': '-40°C ~ +80°C', 'Hassasiyet': '±0.5°C', 'Nem': '%0-100', 'Çözünürlük': '16-bit', 'Arayüz': 'Tek kablo', 'Örnekleme': '0.5 Hz', 'Akım': '1.5 mA' }, tags: ['Sıcaklık', 'Nem', 'Yangın'], pins: 'DATA' },
+  mq2: { icon: '💨', name: 'MQ-2', model: 'MQ-2 Duman Sensörü', color: '#d29922', colorClass: 'warning', desc: 'Duman ve yanıcı gaz sensörü. Erken yangın uyarısı.', specs: { 'Gaz': 'LPG, Metan, Duman', 'Algılama': '300-10000 ppm', 'Isınma': '< 24 saat', 'Voltaj': '5V', 'Akım': '150 mA', 'Çıkış': 'Analog', 'Ömür': '5+ yıl' }, tags: ['Duman', 'Gaz', 'Analog'], pins: 'AOUT, DOUT' },
+  irflame: { icon: '🔥', name: 'IR Flame', model: 'IR Alev Sensörü', color: '#e5484d', colorClass: 'danger', desc: 'Kızılötesi alev dedektörü. Anlık yangın algılama.', specs: { 'Dalga Boyu': '760-1100 nm', 'Açı': '60°', 'Mesafe': '20-100 cm', 'Yanıt': '< 100 ms', 'Voltaj': '3.3V - 5V', 'Akım': '15 mA', 'Çıkış': 'Analog + Dijital' }, tags: ['Alev', 'IR', 'Hızlı'], pins: 'AOUT, DOUT' },
+  fuse: { icon: '⚡', name: 'Sigorta', model: 'PTC Resetlenebilir', color: '#58a6ff', colorClass: 'info', desc: 'Aşırı akım koruması. Elektronik bileşenleri korur.', specs: { 'Akım': '500 mA', 'Voltaj': '6V', 'Tip': 'PTC Polimer', 'Yanıt': '< 1 sn', 'Reset': 'Otomatik', 'Ömür': '1000+ kez' }, tags: ['Koruma', 'PTC', 'Güvenlik'], pins: '+, -' }
+};
+
+const PIN_CONNECTIONS = [
+  { esp: 'GPIO 25', comp: 'INMP441 WS', desc: 'I2S Word Select (LRCLK)' },
+  { esp: 'GPIO 26', comp: 'INMP441 SD', desc: 'I2S Data (DIN)' },
+  { esp: 'GPIO 27', comp: 'INMP441 SCK', desc: 'I2S Bit Clock (BCLK)' },
+  { esp: 'GPIO 18', comp: 'SX1276 NSS', desc: 'LoRa Chip Select (SPI)' },
+  { esp: 'GPIO 23', comp: 'SX1276 MOSI', desc: 'SPI Master Out' },
+  { esp: 'GPIO 19', comp: 'SX1276 MISO', desc: 'SPI Master In' },
+  { esp: 'GPIO 5', comp: 'SX1276 SCK', desc: 'SPI Clock' },
+  { esp: 'GPIO 14', comp: 'SX1276 RST', desc: 'LoRa Reset' },
+  { esp: 'GPIO 26', comp: 'SX1276 DIO0', desc: 'LoRa Interrupt' },
+  { esp: 'GPIO 21', comp: 'MPU6050 SDA', desc: 'I2C Data' },
+  { esp: 'GPIO 22', comp: 'MPU6050 SCL', desc: 'I2C Clock' },
+  { esp: 'GPIO 4', comp: 'DHT22 DATA', desc: 'Sıcaklık/Nem Data' },
+  { esp: 'GPIO 34', comp: 'MQ-2 AOUT', desc: 'Duman Analog Giriş' },
+  { esp: 'GPIO 35', comp: 'IR Flame AOUT', desc: 'Alev Analog Giriş' },
+  { esp: '3.3V', comp: 'Tüm Sensörler', desc: 'Güç hattı' },
+  { esp: 'GND', comp: 'Tüm Bileşenler', desc: 'Toprak hattı' }
+];
+
+const THREATS = {
+  fire: { icon: '🔥', name: 'Yangın Çıtırtısı', color: '#ff6b35', conf: [85, 96] },
+  chainsaw: { icon: '🪚', name: 'Motorlu Testere', color: '#f0b429', conf: [88, 97] },
+  gunshot: { icon: '🔫', name: 'Silah Sesi', color: '#e5484d', conf: [90, 99] },
+  tamper: { icon: '⚠️', name: 'Kurcalama', color: '#a371f7', conf: [95, 100] }
+};
+
+const NODE_POSITIONS = [
+  { id: 'ECO-01', lat: 39.9043, lon: 41.2679, name: 'Erzurum Merkez' },
+  { id: 'ECO-02', lat: 39.8456, lon: 41.3456, name: 'Palandöken Ormanı' },
+  { id: 'ECO-03', lat: 40.0123, lon: 41.4567, name: 'Tortum Şelalesi' },
+  { id: 'ECO-04', lat: 40.2345, lon: 42.1234, name: 'Şenkaya Ormanı' },
+  { id: 'ECO-05', lat: 39.7567, lon: 41.1234, name: 'Ilıca Ormanı' },
+  { id: 'ECO-06', lat: 40.1234, lon: 41.6789, name: 'Uzundere Vadisi' },
+  { id: 'ECO-07', lat: 39.9821, lon: 41.3865, name: 'Palandöken Zirve' },
+  { id: 'ECO-08', lat: 40.3456, lon: 41.2345, name: 'Narman Ormanı' }
+];
+
+let simRunning = false;
+let autoMode = false;
+let autoInterval = null;
+let sendCount = parseInt(localStorage.getItem('ecoacoustic_send_count') || '0');
+let history = JSON.parse(localStorage.getItem('ecoacoustic_sim_history') || '[]');
+
+// ============================================================
+// 🎯 TOAST
+// ============================================================
+class ToastManager {
+  constructor() { this.container = document.getElementById('toastContainer'); }
+  show(msg, type = 'info', duration = 4000) {
+    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<div class="toast-icon">${icons[type]}</div><div class="toast-text">${msg}</div>`;
+    this.container.appendChild(toast);
+    setTimeout(() => { toast.style.animation = 'slideInRight .3s reverse'; setTimeout(() => toast.remove(), 300); }, duration);
+  }
+}
+const toast = new ToastManager();
+
+function log(msg, type = 'info') {
+  const log = document.getElementById('simLog');
+  const time = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const line = document.createElement('div');
+  line.className = 'sim-log-line';
+  line.innerHTML = `<span class="sim-log-time">[${time}]</span><span class="sim-log-msg ${type}">${msg}</span>`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setNodeActive(id, active) { const el = document.getElementById(id); if (el) el.classList.toggle('active', active); }
+function setArrowActive(id, active) { const el = document.getElementById(id); if (el) el.classList.toggle('active', active); }
+function setValue(id, text, active = false) { const el = document.getElementById(id); if (el) { el.textContent = text; el.classList.toggle('active', active); } }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================================
+// 📤 WEB PANELE GÖNDER
+// ============================================================
+function sendAlertToPanel(threatKey) {
+  const t = THREATS[threatKey];
+  const conf = (t.conf[0] + Math.random() * (t.conf[1] - t.conf[0])).toFixed(1);
+  const node = NODE_POSITIONS[Math.floor(Math.random() * NODE_POSITIONS.length)];
+  const alert = {
+    id: `SIM-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+    nodeId: node.id, nodeName: node.name, threatType: threatKey, threatLabel: t.name, icon: t.icon, color: t.color,
+    confidence: parseFloat(conf) / 100, latitude: node.lat + (Math.random() - 0.5) * 0.008, longitude: node.lon + (Math.random() - 0.5) * 0.008,
+    battery: 3.3 + Math.random() * 0.8, rssi: -60 - Math.floor(Math.random() * 35), temperature: 15 + Math.random() * 20,
+    timestamp: new Date().toISOString(), severity: parseFloat(conf) > 93 ? 'high' : parseFloat(conf) > 88 ? 'med' : 'low', source: 'simulation'
+  };
+  const existing = JSON.parse(localStorage.getItem('ecoacoustic_alerts') || '[]');
+  existing.unshift(alert);
+  if (existing.length > 500) existing.pop();
+  localStorage.setItem('ecoacoustic_alerts', JSON.stringify(existing));
+  localStorage.setItem('ecoacoustic_last_alert', JSON.stringify({ id: alert.id, timestamp: Date.now(), source: 'cihaz.html' }));
+  sendCount++;
+  localStorage.setItem('ecoacoustic_send_count', sendCount.toString());
+  updateSendCount();
+  history.unshift({ id: alert.id, icon: alert.icon, threatLabel: alert.threatLabel, threatType: alert.threatType, nodeId: alert.nodeId, nodeName: alert.nodeName, confidence: alert.confidence, timestamp: alert.timestamp });
+  if (history.length > 50) history.pop();
+  localStorage.setItem('ecoacoustic_sim_history', JSON.stringify(history));
+  renderHistory();
+  return alert;
+}
+
+function updateSendCount() { document.getElementById('sendCount').textContent = `📤 ${sendCount} alarm gönderildi`; }
+
+// ============================================================
+// 🎬 SİMÜLASYON
+// ============================================================
+async function runSimulation(threatKey) {
+  if (simRunning) return;
+  simRunning = true;
+  const t = THREATS[threatKey];
+  const conf = (t.conf[0] + Math.random() * (t.conf[1] - t.conf[0])).toFixed(1);
+  document.querySelectorAll('.sim-btn').forEach(b => b.disabled = true);
+  ['nodeMic', 'nodeAI', 'nodeLoRa', 'nodePanel'].forEach(id => setNodeActive(id, false));
+  ['arrow1', 'arrow2', 'arrow3'].forEach(id => setArrowActive(id, false));
+
+  // Neural network başlat
+  activateNeural(threatKey);
+
+  setNodeActive('nodeMic', true);
+  setValue('valMic', `${t.name} algılandı`, true);
+  log(`🎤 Mikrofon ses yakaladı: ${t.name}`, 'info');
+  await sleep(1200);
+  setArrowActive('arrow1', true);
+  await sleep(300);
+  setNodeActive('nodeAI', true);
+  setValue('valAI', `%${conf} güven`, true);
+  log(`🧠 TinyML analizi: %${conf} doğrulukla ${t.name}`, 'success');
+  await sleep(1200);
+  setArrowActive('arrow2', true);
+  await sleep(300);
+  setNodeActive('nodeLoRa', true);
+  setValue('valLoRa', 'Paket gönderiliyor...', true);
+  log(`📡 LoRa TX: 868 MHz paket gönderiliyor...`, 'info');
+  await sleep(1000);
+  setValue('valLoRa', '✓ İletildi', true);
+  log(`✓ Paket iletildi (RSSI: -${Math.floor(Math.random() * 30 + 60)} dBm)`, 'success');
+  await sleep(800);
+  setArrowActive('arrow3', true);
+  await sleep(300);
+  setNodeActive('nodePanel', true);
+  setValue('valPanel', 'Alarm kaydedildi', true);
+  log(`🖥️ OGM Paneli: ${t.icon} ${t.name} alarmı kaydedildi`, 'success');
+  await sleep(500);
+
+  const alert = sendAlertToPanel(threatKey);
+  log(`📤 index.html paneline gönderildi: ${alert.nodeId} — ${alert.confidence.toFixed(2)}`, 'success');
+
+  const parts = ['esp32', 'inmp441', 'sx1276'];
+  for (const p of parts) {
+    const el = document.querySelector(`[data-part="${p}"]`);
+    if (el) { el.classList.add('sending'); setTimeout(() => el.classList.remove('sending'), 1500); }
+  }
+
+  toast.show(`${t.icon} ${t.name} → Panele gönderildi`, threatKey === 'fire' ? 'error' : 'warning', 4000);
+  log(`✅ Simülasyon tamamlandı.`, 'success');
+  simRunning = false;
+  if (!autoMode) document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+}
+
+// ============================================================
+// 🧠 NEURAL NETWORK AKTİVASYON
+// ============================================================
+function activateNeural(threatKey) {
+  // Tüm node'ları sıfırla
+  document.querySelectorAll('.neural-node').forEach(n => n.classList.remove('active'));
+
+  const inputNodes = ['i1', 'i2', 'i3', 'i4', 'i5'];
+  const h1Nodes = ['h1a', 'h1b', 'h1c', 'h1d'];
+  const h2Nodes = ['h2a', 'h2b', 'h2c'];
+  const outputMap = { chainsaw: 'o1', fire: 'o2', gunshot: 'o3', tamper: 'o4' };
+
+  // Giriş katmanı
+  inputNodes.forEach((n, i) => {
+    setTimeout(() => {
+      const el = document.querySelector(`[data-node="${n}"]`);
+      if (el) el.classList.add('active');
+    }, i * 100);
+  });
+
+  // Gizli 1
+  setTimeout(() => {
+    h1Nodes.forEach((n, i) => {
+      setTimeout(() => {
+        const el = document.querySelector(`[data-node="${n}"]`);
+        if (el) el.classList.add('active');
+      }, i * 80);
+    });
+  }, 600);
+
+  // Gizli 2
+  setTimeout(() => {
+    h2Nodes.forEach((n, i) => {
+      setTimeout(() => {
+        const el = document.querySelector(`[data-node="${n}"]`);
+        if (el) el.classList.add('active');
+      }, i * 80);
+    });
+  }, 1100);
+
+  // Çıkış
+  setTimeout(() => {
+    const outputNode = outputMap[threatKey];
+    if (outputNode) {
+      const el = document.querySelector(`[data-node="${outputNode}"]`);
+      if (el) el.classList.add('active');
+    }
+    const t = THREATS[threatKey];
+    const result = document.getElementById('neuralResult');
+    result.textContent = `${t.icon} ${t.name}`;
+    result.style.color = t.color;
+  }, 1600);
+
+  // 5 saniye sonra temizle
+  setTimeout(() => {
+    document.querySelectorAll('.neural-node').forEach(n => n.classList.remove('active'));
+    const result = document.getElementById('neuralResult');
+    result.textContent = 'Bekliyor...';
+    result.style.color = 'var(--primary-3)';
+  }, 5000);
+}
+
+// ============================================================
+// 🔄 OTOMATİK MOD
+// ============================================================
+function toggleAutoMode() {
+  autoMode = !autoMode;
+  const btn = document.getElementById('simAuto');
+  if (autoMode) {
+    btn.classList.add('active');
+    btn.innerHTML = '<span>⏸️</span><span>Durdur</span>';
+    log('🤖 Otomatik mod AÇIK — Her 8 saniyede rastgele alarm', 'warning');
+    toast.show('🤖 Otomatik mod başlatıldı', 'warning', 3000);
+    const types = Object.keys(THREATS);
+    runSimulation(types[Math.floor(Math.random() * types.length)]);
+    autoInterval = setInterval(() => {
+      const types = Object.keys(THREATS);
+      runSimulation(types[Math.floor(Math.random() * types.length)]);
+    }, 8000);
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '<span>🤖</span><span>Otomatik Mod</span>';
+    log('🤖 Otomatik mod KAPALI', 'info');
+    toast.show('⏹️ Otomatik mod durduruldu', 'info', 3000);
+    if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+    document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+  }
+}
+
+// ============================================================
+// 🔄 SIFIRLA
+// ============================================================
+function resetSim() {
+  ['nodeMic', 'nodeAI', 'nodeLoRa', 'nodePanel'].forEach(id => setNodeActive(id, false));
+  ['arrow1', 'arrow2', 'arrow3'].forEach(id => setArrowActive(id, false));
+  setValue('valMic', 'Bekliyor...');
+  setValue('valAI', 'Bekliyor...');
+  setValue('valLoRa', 'Bekliyor...');
+  setValue('valPanel', 'Bekliyor...');
+  document.querySelectorAll('.neural-node').forEach(n => n.classList.remove('active'));
+  const log = document.getElementById('simLog');
+  log.innerHTML = `<div class="sim-log-line"><span class="sim-log-time">[SİSTEM]</span><span class="sim-log-msg success">✓ Simülasyon sıfırlandı.</span></div>`;
+  simRunning = false;
+  document.querySelectorAll('.sim-btn').forEach(b => b.disabled = false);
+}
+
+function resetAll() {
+  if (!confirm('Tüm geçmiş ve gönderim sayısı sıfırlanacak. Emin misiniz?')) return;
+  if (autoMode) toggleAutoMode();
+  resetSim();
+  sendCount = 0;
+  history = [];
+  localStorage.removeItem('ecoacoustic_send_count');
+  localStorage.removeItem('ecoacoustic_sim_history');
+  localStorage.removeItem('ecoacoustic_alerts');
+  localStorage.removeItem('ecoacoustic_last_alert');
+  updateSendCount();
+  renderHistory();
+  toast.show('🔄 Tüm veriler sıfırlandı', 'success');
+  log('🔄 Sistem tamamen sıfırlandı', 'warning');
+}
+
+// ============================================================
+// 📜 GEÇMİŞ
+// ============================================================
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
+  if (!container) return;
+  if (history.length === 0) {
+    container.innerHTML = `<div class="history-empty"><div class="history-empty-icon">📭</div><div class="history-empty-text">Henüz alarm gönderilmedi</div></div>`;
+    return;
+  }
+  container.innerHTML = history.map(h => {
+    const time = new Date(h.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const conf = (h.confidence * 100).toFixed(0);
+    return `<div class="history-item"><div class="history-icon" style="color: ${THREATS[h.threatType]?.color || '#2ea043'};">${h.icon}</div><div class="history-content"><div class="history-title">${h.threatLabel}</div><div class="history-meta"><span>📡 ${h.nodeId}</span><span>📍 ${h.nodeName}</span><span>🕐 ${time}</span></div></div><div class="history-badge">${conf}%</div></div>`;
+  }).join('');
+}
+
+// ============================================================
+// 📡 PANEL BAĞLANTI
+// ============================================================
+function checkPanelConnection() {
+  const panelStatus = document.getElementById('panelStatus');
+  const panelBadge = document.getElementById('panelBadge');
+  const isSameOrigin = window.location.origin.includes('github.io') || window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+  if (isSameOrigin) {
+    panelStatus.textContent = 'Hazır (index.html açabilirsin)';
+    panelBadge.classList.remove('disconnected');
+    panelBadge.classList.add('connected');
+    panelBadge.innerHTML = '<span>🔗</span><span>Bağlantı Aktif</span>';
+  } else {
+    panelStatus.textContent = 'Farklı origin';
+    panelBadge.classList.remove('connected');
+    panelBadge.classList.add('disconnected');
+    panelBadge.innerHTML = '<span>⚠️</span><span>Origin Uyuşmuyor</span>';
+  }
+}
+
+// ============================================================
+// 📦 PARÇA GRID
+// ============================================================
+function renderParts() {
+  const grid = document.getElementById('partsGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(PARTS).map(([key, p], i) => `<div class="part-card" data-part="${key}" style="--part-color: ${p.color}; --part-color-glow: ${p.color}44; animation-delay: ${i * 0.05}s;"><div class="part-card-header"><div class="part-card-icon">${p.icon}</div><div class="part-card-info"><div class="part-card-name">${p.name}</div><div class="part-card-model">${p.model}</div></div></div><div class="part-card-desc">${p.desc}</div><div class="part-card-tags">${p.tags.map(t => `<span class="part-tag ${p.colorClass}">${t}</span>`).join('')}</div></div>`).join('');
+  grid.querySelectorAll('.part-card').forEach(card => { card.addEventListener('click', () => showPartDetail(card.dataset.part)); });
+}
+
+function renderPins() {
+  const rows = document.getElementById('pinRows');
+  if (!rows) return;
+  rows.innerHTML = PIN_CONNECTIONS.map(p => `<div class="pin-row"><div class="pin-esp">${p.esp}</div><div class="pin-component">${p.comp}</div><div class="pin-desc">${p.desc}</div></div>`).join('');
+}
+
+function showPartDetail(partKey) {
+  const p = PARTS[partKey];
+  if (!p) return;
+  document.getElementById('modalIcon').textContent = p.icon;
+  document.getElementById('modalTitle').textContent = p.name;
+  document.getElementById('modalSubtitle').textContent = p.model;
+  document.getElementById('modalBody').innerHTML = `<div class="modal-section"><div class="modal-section-title">📋 Açıklama</div><div class="modal-desc">${p.desc}</div></div><div class="modal-section"><div class="modal-section-title">⚙️ Teknik Özellikler</div><div class="modal-grid">${Object.entries(p.specs).map(([k, v]) => `<div class="modal-grid-item"><div class="modal-grid-label">${k}</div><div class="modal-grid-value">${v}</div></div>`).join('')}</div></div><div class="modal-section"><div class="modal-section-title">🔌 Pin Bağlantıları</div><div class="modal-desc">${p.pins}</div></div><div class="modal-section"><div class="modal-section-title">🏷️ Etiketler</div><div class="part-card-tags" style="gap: 6px;">${p.tags.map(t => `<span class="part-tag ${p.colorClass}">${t}</span>`).join('')}</div></div>`;
+  document.getElementById('partModal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('partModal').classList.remove('show'); }
+document.getElementById('partModal')?.addEventListener('click', (e) => { if (e.target.id === 'partModal') closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+function bindDeviceParts() {
+  document.querySelectorAll('.device-part').forEach(el => {
+    el.addEventListener('click', () => {
+      const part = el.dataset.part;
+      showPartDetail(part);
+      document.querySelectorAll('.device-part').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      setTimeout(() => el.classList.remove('active'), 2000);
+    });
+  });
+}
+
+function bindDeviceRotate() {
+  document.querySelectorAll('.device-ctrl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.device-ctrl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const deg = parseInt(btn.dataset.rotate);
+      document.getElementById('deviceScene').style.transform = `rotateX(-8deg) rotateY(${deg}deg)`;
+    });
+  });
+}
+
+function bindCodeTabs() {
+  document.querySelectorAll('.code-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.code-panel[data-panel="${tab.dataset.code}"]`).classList.add('active');
+    });
+  });
+}
+
+// ============================================================
+// 🌊 PARÇACIK EFEKTİ
+// ============================================================
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 2 + 1,
+      color: Math.random() > 0.5 ? '#2ea043' : '#58a6ff'
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + '80';
+      ctx.fill();
+
+      // Bağlantı çizgileri
+      particles.slice(i + 1).forEach(p2 => {
+        const d = Math.hypot(p.x - p2.x, p.y - p2.y);
+        if (d < 100) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(46,160,67,${0.1 * (1 - d / 100)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      });
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============================================================
+// ⚡ ENERJİ AKIŞI CANLI
+// ============================================================
+function updateEnergy() {
+  const solar = (5.5 + Math.random() * 0.8).toFixed(1);
+  const battery = Math.max(20, Math.min(100, 85 + Math.floor((Math.random() - 0.5) * 6)));
+  const esp = 240 + Math.floor(Math.random() * 50);
+  const sensors = 100 + Math.floor(Math.random() * 40);
+
+  const solarEl = document.getElementById('energySolar');
+  const battEl = document.getElementById('energyBattery');
+  const espEl = document.getElementById('energyESP');
+  const sensEl = document.getElementById('energySensors');
+
+  if (solarEl) solarEl.textContent = solar;
+  if (battEl) battEl.textContent = battery;
+  if (espEl) espEl.textContent = esp;
+  if (sensEl) sensEl.textContent = sensors;
+}
+
+// ============================================================
+// 📈 PERFORMANS GRAFİKLERİ CANLI
+// ============================================================
+function initPerfCharts() {
+  ['CPU', 'RAM', 'Signal', 'Battery'].forEach(type => {
+    const chart = document.getElementById(`perf${type}Chart`);
+    if (!chart) return;
+    chart.innerHTML = '';
+    for (let i = 0; i < 20; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'perf-bar';
+      if (type === 'Signal') bar.classList.add('info');
+      if (type === 'Battery') bar.classList.add('warning');
+      bar.style.height = Math.random() * 80 + 20 + '%';
+      chart.appendChild(bar);
+    }
+  });
+}
+
+function updatePerf() {
+  // CPU
+  const cpu = 40 + Math.floor(Math.random() * 30);
+  const cpuEl = document.getElementById('perfCPU');
+  if (cpuEl) cpuEl.innerHTML = `${cpu}<span style="font-size:14px;color:var(--text-3);">%</span>`;
+  const cpuChart = document.getElementById('perfCPUChart');
+  if (cpuChart) {
+    const bars = cpuChart.querySelectorAll('.perf-bar');
+    bars.forEach((b, i) => { if (i < bars.length - 1) b.style.height = bars[i + 1].style.height; });
+    if (bars.length) bars[bars.length - 1].style.height = cpu + '%';
+  }
+
+  // RAM
+  const ram = 55 + Math.floor(Math.random() * 25);
+  const ramEl = document.getElementById('perfRAM');
+  if (ramEl) ramEl.innerHTML = `${ram}<span style="font-size:14px;color:var(--text-3);">%</span>`;
+  const ramChart = document.getElementById('perfRAMChart');
+  if (ramChart) {
+    const bars = ramChart.querySelectorAll('.perf-bar');
+    bars.forEach((b, i) => { if (i < bars.length - 1) b.style.height = bars[i + 1].style.height; });
+    if (bars.length) bars[bars.length - 1].style.height = ram + '%';
+  }
+
+  // Signal
+  const signal = -60 - Math.floor(Math.random() * 30);
+  const sigEl = document.getElementById('perfSignal');
+  if (sigEl) sigEl.innerHTML = `${signal}<span style="font-size:14px;color:var(--text-3);">dBm</span>`;
+  const sigChart = document.getElementById('perfSignalChart');
+  if (sigChart) {
+    const bars = sigChart.querySelectorAll('.perf-bar');
+    const h = ((signal + 100) / 50) * 100;
+    bars.forEach((b, i) => { if (i < bars.length - 1) b.style.height = bars[i + 1].style.height; });
+    if (bars.length) bars[bars.length - 1].style.height = Math.max(10, h) + '%';
+  }
+
+  // Battery
+  const battery = 80 + Math.floor(Math.random() * 15);
+  const batEl = document.getElementById('perfBattery');
+  if (batEl) batEl.innerHTML = `${battery}<span style="font-size:14px;color:var(--text-3);">%</span>`;
+  const batChart = document.getElementById('perfBatteryChart');
+  if (batChart) {
+    const bars = batChart.querySelectorAll('.perf-bar');
+    bars.forEach((b, i) => { if (i < bars.length - 1) b.style.height = bars[i + 1].style.height; });
+    if (bars.length) bars[bars.length - 1].style.height = battery + '%';
+  }
+}
+
+// ============================================================
+// 🚀 INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderParts();
+  renderPins();
+  renderHistory();
+  updateSendCount();
+  bindDeviceParts();
+  bindDeviceRotate();
+  bindCodeTabs();
+  checkPanelConnection();
+  initParticles();
+  initPerfCharts();
+
+  // Canlı güncellemeler
+  setInterval(updateEnergy, 2000);
+  setInterval(updatePerf, 1500);
+
+  // Simülasyon butonları
+  document.getElementById('simFire').addEventListener('click', () => runSimulation('fire'));
+  document.getElementById('simChainsaw').addEventListener('click', () => runSimulation('chainsaw'));
+  document.getElementById('simGunshot').addEventListener('click', () => runSimulation('gunshot'));
+  document.getElementById('simTamper').addEventListener('click', () => runSimulation('tamper'));
+  document.getElementById('simAuto').addEventListener('click', toggleAutoMode);
+  document.getElementById('simReset').addEventListener('click', resetSim);
+
+  window.addEventListener('beforeunload', () => { if (autoInterval) clearInterval(autoInterval); });
+
+  console.log('%c🔧 EcoAcoustic-AI Cihaz Simülasyonu v2.0 hazır', 'color:#2ea043;font-size:14px;font-weight:800;');
+  console.log('%c⚡ Aşama 2: 5 yeni özellik aktif', 'color:#58a6ff;font-size:12px;font-weight:600;');
+});
+</script>
+</body>
+</html>
 
   <!-- GERİ KALAN BÖLÜMLER (Mevcut yapı — 3D Cihaz, Parçalar, Pinler, Nasıl Çalışır, Kod) -->
   <!-- Bu bölümler ikinci parçada devam ediyor -->
