@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-<meta name="theme-color" content="#000000" />
+<meta name="theme-color" content="#2ea043" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>EcoAcoustic-AI v4.0 — OGM Komuta Merkezi</title>
+<meta name="apple-mobile-web-app-title" content="EcoAcoustic" />
+<title>EcoAcoustic-AI v4.1 — OGM Komuta Merkezi</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,63 +29,45 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  /* Renk — Base */
   --bg: #000000;
   --bg-2: #0a0a0a;
   --bg-3: #111111;
   --bg-4: #1a1a1a;
   --bg-5: #222222;
-
-  /* Renk — Border */
   --border: #1f1f1f;
   --border-2: #2a2a2a;
   --border-3: #333333;
   --border-hover: #404040;
-
-  /* Renk — Text */
   --text: #ededed;
   --text-2: #a1a1a1;
   --text-3: #666666;
   --text-4: #444444;
-
-  /* Renk — Semantik */
   --primary: #2ea043;
   --primary-2: #3fb950;
   --primary-3: #56d364;
   --primary-glow: rgba(46,160,67,.2);
   --primary-soft: rgba(46,160,67,.1);
-
   --danger: #f85149;
   --danger-2: #ff7b72;
   --danger-glow: rgba(248,81,73,.2);
   --danger-soft: rgba(248,81,73,.1);
-
   --warning: #d29922;
   --warning-2: #f0b429;
   --warning-glow: rgba(210,153,34,.2);
   --warning-soft: rgba(210,153,34,.1);
-
   --info: #58a6ff;
   --info-2: #79c0ff;
   --info-glow: rgba(88,166,255,.2);
   --info-soft: rgba(88,166,255,.1);
-
-  --success: #2ea043;
-  --success-2: #3fb950;
-
   --purple: #a371f7;
   --purple-2: #bc8cff;
   --purple-glow: rgba(163,113,247,.2);
   --purple-soft: rgba(163,113,247,.1);
-
-  /* Renk — Threat */
   --fire: #ff6b35;
   --fire-2: #ff8c5a;
   --chainsaw: #f0b429;
   --gunshot: #e5484d;
   --tamper: #a371f7;
-
-  /* Spacing — 8px Grid */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
@@ -88,8 +76,6 @@
   --sp-6: 32px;
   --sp-7: 48px;
   --sp-8: 64px;
-
-  /* Radius */
   --r-1: 4px;
   --r-2: 6px;
   --r-3: 8px;
@@ -98,34 +84,23 @@
   --r-6: 20px;
   --r-7: 24px;
   --r-full: 999px;
-
-  /* Shadow — 5 katman */
   --shadow-1: 0 1px 2px rgba(0,0,0,.3);
   --shadow-2: 0 4px 12px rgba(0,0,0,.35);
   --shadow-3: 0 12px 32px rgba(0,0,0,.4);
   --shadow-4: 0 24px 64px rgba(0,0,0,.5);
   --shadow-5: 0 40px 100px rgba(0,0,0,.6);
-
-  /* Glass */
   --glass-bg: rgba(10,10,10,.72);
   --glass-bg-2: rgba(17,17,17,.85);
   --glass-bg-3: rgba(10,10,10,.85);
   --glass-border: rgba(255,255,255,.08);
   --glass-border-2: rgba(255,255,255,.12);
   --glass-blur: blur(20px) saturate(180%);
-  --glass-blur-sm: blur(12px) saturate(180%);
-
-  /* Safe area */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-
-  /* Fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
-
-  /* Transitions */
   --t-fast: .15s cubic-bezier(.4,0,.2,1);
   --t-base: .25s cubic-bezier(.4,0,.2,1);
   --t-slow: .4s cubic-bezier(.4,0,.2,1);
@@ -142,8 +117,6 @@ html, body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
 }
 
 body {
@@ -153,9 +126,6 @@ body {
   position: relative;
 }
 
-/* ============================================================
-   🎭 KATMANLI ARKA PLAN
-   ============================================================ */
 body::before {
   content: '';
   position: fixed;
@@ -208,38 +178,17 @@ body > * { position: relative; z-index: 1; }
 @keyframes ringPulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3.5); opacity: 0; } }
 @keyframes logoPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px var(--primary-glow)); } 50% { transform: scale(1.08); filter: drop-shadow(0 0 35px var(--primary-glow)); } }
 @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
-@keyframes alarmBar { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
 @keyframes countUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes ripple { 0% { transform: scale(0); opacity: .5; } 100% { transform: scale(4); opacity: 0; } }
-@keyframes rotateIn { from { transform: rotate(-180deg) scale(0); } to { transform: rotate(0) scale(1); } }
 
 /* ============================================================
-   🎯 GLASSMORPHISM GELİŞMİŞ
+   GLASS
    ============================================================ */
 .glass {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  position: relative;
-}
-
-.glass::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,.05) 0%, transparent 30%);
-  pointer-events: none;
-}
-
-.glass-2 {
-  background: var(--glass-bg-2);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-2);
   position: relative;
 }
 
@@ -319,7 +268,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 .login-form { display: flex; flex-direction: column; gap: var(--sp-4); }
-
 .form-group { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 .form-label {
@@ -344,14 +292,12 @@ body > * { position: relative; z-index: 1; }
 }
 
 .form-input:hover { border-color: var(--border-3); }
-
 .form-input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px var(--primary-soft);
   background: var(--bg-4);
 }
-
 .form-input::placeholder { color: var(--text-4); }
 
 .login-btn {
@@ -363,7 +309,6 @@ body > * { position: relative; z-index: 1; }
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: .3px;
   cursor: pointer;
   transition: all var(--t-base);
   margin-top: var(--sp-2);
@@ -400,7 +345,6 @@ body > * { position: relative; z-index: 1; }
   font-weight: 600;
   display: none;
 }
-
 .login-error.show { display: block; animation: shake .4s; }
 
 .login-demo {
@@ -440,7 +384,6 @@ body > * { position: relative; z-index: 1; }
   transform: translateY(-2px);
   box-shadow: 0 4px 12px var(--primary-glow);
 }
-
 .demo-account:active { transform: scale(.95); }
 
 /* ============================================================
@@ -506,12 +449,7 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: -.1px;
 }
 
-.nav-link:hover {
-  color: var(--text);
-  background: var(--bg-3);
-  transform: translateY(-1px);
-}
-
+.nav-link:hover { color: var(--text); background: var(--bg-3); transform: translateY(-1px); }
 .nav-link.active { color: var(--text); background: var(--bg-4); }
 
 .nav-link.active::after {
@@ -551,9 +489,7 @@ body > * { position: relative; z-index: 1; }
   transform: translateY(-2px);
   box-shadow: var(--shadow-2);
 }
-
 .nav-icon-btn:active { transform: scale(.92); }
-
 .nav-icon-btn.active {
   background: var(--primary);
   color: white;
@@ -596,12 +532,7 @@ body > * { position: relative; z-index: 1; }
   color: var(--text);
 }
 
-.nav-user:hover {
-  border-color: var(--border-3);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-2);
-}
-
+.nav-user:hover { border-color: var(--border-3); transform: translateY(-1px); box-shadow: var(--shadow-2); }
 .nav-user:active { transform: scale(.97); }
 
 .nav-user-avatar {
@@ -703,17 +634,11 @@ body > * { position: relative; z-index: 1; }
   gap: var(--sp-3);
 }
 
-.user-dropdown-item:hover {
-  background: var(--bg-3);
-  color: var(--text);
-  transform: translateX(3px);
-}
-
+.user-dropdown-item:hover { background: var(--bg-3); color: var(--text); transform: translateX(3px); }
 .user-dropdown-item.danger { color: var(--danger-2); }
 .user-dropdown-item.danger:hover { background: var(--danger-soft); }
 
 .user-dropdown-icon { font-size: 16px; }
-
 .user-dropdown-divider { height: 1px; background: var(--border); margin: var(--sp-2) 0; }
 
 /* ============================================================
@@ -857,12 +782,7 @@ body > * { position: relative; z-index: 1; }
   transform: translate(50%, -50%);
 }
 
-.kpi-card:hover {
-  border-color: var(--border-hover);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-3);
-}
-
+.kpi-card:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: var(--shadow-3); }
 .kpi-card:hover::before { opacity: 1; }
 .kpi-card:hover::after { opacity: 1; }
 
@@ -907,7 +827,6 @@ body > * { position: relative; z-index: 1; }
   line-height: 1;
   margin-bottom: var(--sp-3);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
   position: relative;
   z-index: 1;
 }
@@ -929,11 +848,7 @@ body > * { position: relative; z-index: 1; }
   border: 1px solid rgba(46,160,67,.15);
 }
 
-.kpi-change.down {
-  background: var(--danger-soft);
-  color: var(--danger-2);
-  border-color: rgba(248,81,73,.15);
-}
+.kpi-change.down { background: var(--danger-soft); color: var(--danger-2); border-color: rgba(248,81,73,.15); }
 
 /* ============================================================
    GRID & CARDS
@@ -955,10 +870,7 @@ body > * { position: relative; z-index: 1; }
   box-shadow: var(--shadow-1);
 }
 
-.card:hover {
-  border-color: var(--border-2);
-  box-shadow: var(--shadow-2);
-}
+.card:hover { border-color: var(--border-2); box-shadow: var(--shadow-2); }
 
 .card-header {
   display: flex;
@@ -981,7 +893,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 .card-title-icon { font-size: 16px; }
-
 .card-actions { display: flex; gap: var(--sp-2); align-items: center; }
 
 .chip {
@@ -998,26 +909,9 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: .2px;
 }
 
-.chip:hover {
-  color: var(--text);
-  border-color: var(--border-3);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-1);
-}
-
-.chip.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
-
-.chip.live {
-  background: var(--primary-soft);
-  color: var(--primary-3);
-  border-color: rgba(46,160,67,.3);
-}
-
+.chip:hover { color: var(--text); border-color: var(--border-3); transform: translateY(-1px); box-shadow: var(--shadow-1); }
+.chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
+.chip.live { background: var(--primary-soft); color: var(--primary-3); border-color: rgba(46,160,67,.3); }
 .chip.live::before {
   content: '';
   display: inline-block;
@@ -1031,7 +925,7 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* ============================================================
-   HARİTA
+   MAP
    ============================================================ */
 .map-container {
   position: relative;
@@ -1057,7 +951,6 @@ body > * { position: relative; z-index: 1; }
 
 .leaflet-popup-content { margin: 0; font-size: 12px; }
 .leaflet-popup-tip { background: var(--glass-bg-2); border: 1px solid var(--glass-border-2); }
-
 .leaflet-popup-close-button {
   color: var(--text-2) !important;
   font-size: 20px !important;
@@ -1065,10 +958,7 @@ body > * { position: relative; z-index: 1; }
   transition: transform var(--t-base);
 }
 
-.leaflet-popup-close-button:hover {
-  color: var(--text) !important;
-  transform: rotate(90deg);
-}
+.leaflet-popup-close-button:hover { color: var(--text) !important; transform: rotate(90deg); }
 
 .leaflet-control-zoom {
   border: 1px solid var(--glass-border-2) !important;
@@ -1088,7 +978,6 @@ body > * { position: relative; z-index: 1; }
   height: 36px !important;
   line-height: 36px !important;
   font-size: 18px !important;
-  transition: background var(--t-fast);
 }
 
 .leaflet-control-zoom a:hover { background: var(--bg-4) !important; }
@@ -1101,7 +990,6 @@ body > * { position: relative; z-index: 1; }
   padding: 2px 8px !important;
   border-radius: var(--r-1) !important;
   margin: 8px !important;
-  backdrop-filter: blur(10px);
 }
 
 .map-overlay-top {
@@ -1144,19 +1032,9 @@ body > * { position: relative; z-index: 1; }
   white-space: nowrap;
 }
 
-.map-filter-btn:hover {
-  color: var(--text);
-  background: rgba(255,255,255,.06);
-  transform: translateY(-1px);
-}
-
+.map-filter-btn:hover { color: var(--text); background: rgba(255,255,255,.06); transform: translateY(-1px); }
 .map-filter-btn:active { transform: scale(.95); }
-
-.map-filter-btn.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
+.map-filter-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
 
 .map-layer-btn {
   width: 34px;
@@ -1173,19 +1051,9 @@ body > * { position: relative; z-index: 1; }
   justify-content: center;
 }
 
-.map-layer-btn:hover {
-  color: var(--text);
-  background: rgba(255,255,255,.06);
-  transform: scale(1.1);
-}
-
+.map-layer-btn:hover { color: var(--text); background: rgba(255,255,255,.06); transform: scale(1.1); }
 .map-layer-btn:active { transform: scale(.9); }
-
-.map-layer-btn.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
+.map-layer-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
 
 .map-overlay-bottom {
   position: absolute;
@@ -1233,7 +1101,7 @@ body > * { position: relative; z-index: 1; }
 }
 
 /* ============================================================
-   AKTİVİTE
+   ACTIVITY
    ============================================================ */
 .activity-feed {
   max-height: 540px;
@@ -1253,12 +1121,7 @@ body > * { position: relative; z-index: 1; }
   animation: slideInRight .35s var(--t-base);
 }
 
-.activity-item:hover {
-  background: var(--bg-3);
-  border-color: var(--border-2);
-  transform: translateX(-3px);
-  box-shadow: var(--shadow-1);
-}
+.activity-item:hover { background: var(--bg-3); border-color: var(--border-2); transform: translateX(-3px); box-shadow: var(--shadow-1); }
 
 .activity-icon {
   width: 40px;
@@ -1292,7 +1155,6 @@ body > * { position: relative; z-index: 1; }
   display: flex;
   justify-content: space-between;
   gap: var(--sp-2);
-  letter-spacing: -.1px;
 }
 
 .activity-badge {
@@ -1356,12 +1218,7 @@ body > * { position: relative; z-index: 1; }
   animation: slideInUp .35s var(--t-base) backwards;
 }
 
-.node-tile:hover {
-  background: var(--bg-4);
-  border-color: var(--border-hover);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-3);
-}
+.node-tile:hover { background: var(--bg-4); border-color: var(--border-hover); transform: translateY(-4px); box-shadow: var(--shadow-3); }
 
 .node-tile::before {
   content: '';
@@ -1373,7 +1230,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 .node-tile:hover::before { width: 5px; }
-
 .node-tile.warning::before { background: linear-gradient(180deg, var(--warning), var(--warning-2)); }
 .node-tile.danger::before { background: linear-gradient(180deg, var(--danger), var(--danger-2)); }
 
@@ -1491,13 +1347,7 @@ body > * { position: relative; z-index: 1; }
   animation: slideInRight .3s var(--t-base);
 }
 
-.virtual-item:hover {
-  background: var(--bg-4);
-  border-color: var(--border-hover);
-  transform: translateX(-4px);
-  box-shadow: var(--shadow-3);
-}
-
+.virtual-item:hover { background: var(--bg-4); border-color: var(--border-hover); transform: translateX(-4px); box-shadow: var(--shadow-3); }
 .virtual-item.chainsaw { border-left-color: var(--chainsaw); }
 .virtual-item.fire { border-left-color: var(--fire); }
 .virtual-item.gunshot { border-left-color: var(--gunshot); }
@@ -1656,13 +1506,7 @@ body > * { position: relative; z-index: 1; }
   flex-shrink: 0;
 }
 
-.modal-close:hover {
-  background: var(--danger);
-  color: white;
-  border-color: var(--danger);
-  transform: rotate(90deg);
-  box-shadow: 0 0 20px var(--danger-glow);
-}
+.modal-close:hover { background: var(--danger); color: white; border-color: var(--danger); transform: rotate(90deg); box-shadow: 0 0 20px var(--danger-glow); }
 
 .modal-body { padding: var(--sp-5) var(--sp-6); }
 .modal-section { margin-bottom: var(--sp-5); }
@@ -1691,11 +1535,7 @@ body > * { position: relative; z-index: 1; }
   transition: all var(--t-base);
 }
 
-.modal-grid-item:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-3);
-  box-shadow: var(--shadow-1);
-}
+.modal-grid-item:hover { transform: translateY(-2px); border-color: var(--border-3); box-shadow: var(--shadow-1); }
 
 .modal-grid-label {
   font-size: 9px;
@@ -1718,7 +1558,6 @@ body > * { position: relative; z-index: 1; }
   background: var(--bg-4);
   border-radius: var(--r-full);
   overflow: hidden;
-  position: relative;
 }
 
 .confidence-fill {
@@ -1736,10 +1575,7 @@ body > * { position: relative; z-index: 1; }
   box-shadow: 0 0 12px var(--primary-glow);
 }
 
-.confidence-fill.high {
-  background: linear-gradient(90deg, var(--danger), var(--danger-2));
-  box-shadow: 0 0 12px var(--danger-glow);
-}
+.confidence-fill.high { background: linear-gradient(90deg, var(--danger), var(--danger-2)); box-shadow: 0 0 12px var(--danger-glow); }
 
 .modal-actions {
   display: flex;
@@ -1766,33 +1602,11 @@ body > * { position: relative; z-index: 1; }
   letter-spacing: -.1px;
 }
 
-.btn:hover {
-  background: var(--bg-4);
-  border-color: var(--border-3);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-2);
-}
-
+.btn:hover { background: var(--bg-4); border-color: var(--border-3); transform: translateY(-2px); box-shadow: var(--shadow-2); }
 .btn:active { transform: scale(.97); }
-
-.btn.primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  border-color: var(--primary);
-  color: white;
-  box-shadow: 0 4px 16px var(--primary-glow);
-}
-
-.btn.primary:hover {
-  box-shadow: 0 12px 28px var(--primary-glow);
-  transform: translateY(-2px);
-}
-
-.btn.danger {
-  background: linear-gradient(135deg, var(--danger), var(--danger-2));
-  border-color: var(--danger);
-  color: white;
-  box-shadow: 0 4px 16px var(--danger-glow);
-}
+.btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); border-color: var(--primary); color: white; box-shadow: 0 4px 16px var(--primary-glow); }
+.btn.primary:hover { box-shadow: 0 12px 28px var(--primary-glow); transform: translateY(-2px); }
+.btn.danger { background: linear-gradient(135deg, var(--danger), var(--danger-2)); border-color: var(--danger); color: white; box-shadow: 0 4px 16px var(--danger-glow); }
 
 /* ============================================================
    SETTINGS
@@ -1811,7 +1625,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 .settings-section:hover { box-shadow: var(--shadow-2); }
-
 .settings-section:nth-child(1) { animation-delay: .05s; }
 .settings-section:nth-child(2) { animation-delay: .1s; }
 .settings-section:nth-child(3) { animation-delay: .15s; }
@@ -1837,7 +1650,6 @@ body > * { position: relative; z-index: 1; }
 }
 
 .settings-section-desc { font-size: 12px; color: var(--text-3); font-weight: 500; }
-
 .settings-list { padding: var(--sp-2); }
 
 .settings-item {
@@ -1850,11 +1662,7 @@ body > * { position: relative; z-index: 1; }
   transition: all var(--t-base);
 }
 
-.settings-item:hover {
-  background: var(--bg-3);
-  transform: translateX(3px);
-}
-
+.settings-item:hover { background: var(--bg-3); transform: translateX(3px); }
 .settings-item-info { flex: 1; min-width: 0; }
 
 .settings-item-label {
@@ -1862,7 +1670,6 @@ body > * { position: relative; z-index: 1; }
   font-weight: 700;
   color: var(--text);
   margin-bottom: var(--sp-1);
-  letter-spacing: -.1px;
 }
 
 .settings-item-desc { font-size: 11px; color: var(--text-3); font-weight: 500; }
@@ -1893,16 +1700,8 @@ body > * { position: relative; z-index: 1; }
   box-shadow: var(--shadow-1);
 }
 
-.toggle input:checked + .toggle-slider {
-  background: var(--primary);
-  border-color: var(--primary);
-  box-shadow: 0 0 12px var(--primary-glow);
-}
-
-.toggle input:checked + .toggle-slider:before {
-  transform: translateX(20px);
-  background: white;
-}
+.toggle input:checked + .toggle-slider { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
+.toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: white; }
 
 .settings-select {
   padding: var(--sp-2) var(--sp-3);
@@ -1919,12 +1718,7 @@ body > * { position: relative; z-index: 1; }
 }
 
 .settings-select:hover { border-color: var(--border-3); }
-
-.settings-select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
-}
+.settings-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
 
 .settings-range {
   width: 180px;
@@ -1948,16 +1742,7 @@ body > * { position: relative; z-index: 1; }
 }
 
 .settings-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-.settings-range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 0 12px var(--primary-glow);
-}
+.settings-range::-moz-range-thumb { width: 18px; height: 18px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 2px solid white; }
 
 .theme-grid {
   display: grid;
@@ -1983,16 +1768,8 @@ body > * { position: relative; z-index: 1; }
   background: var(--bg-3);
 }
 
-.theme-option:hover {
-  border-color: var(--border-hover);
-  transform: scale(1.05);
-  box-shadow: var(--shadow-2);
-}
-
-.theme-option.active {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft), var(--shadow-2);
-}
+.theme-option:hover { border-color: var(--border-hover); transform: scale(1.05); box-shadow: var(--shadow-2); }
+.theme-option.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft), var(--shadow-2); }
 
 .theme-preview {
   width: 100%;
@@ -2025,15 +1802,9 @@ body > * { position: relative; z-index: 1; }
   cursor: pointer;
   transition: all var(--t-base);
   font-family: inherit;
-  letter-spacing: .2px;
 }
 
-.btn-danger-outline:hover {
-  background: var(--danger);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--danger-glow);
-}
+.btn-danger-outline:hover { background: var(--danger); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px var(--danger-glow); }
 
 /* ============================================================
    TOAST
@@ -2073,7 +1844,7 @@ body > * { position: relative; z-index: 1; }
 .toast.removing { animation: toastOut .3s var(--t-base) forwards; }
 
 .toast-icon { font-size: 18px; flex-shrink: 0; }
-.toast-text { font-size: 12px; color: var(--text); font-weight: 700; letter-spacing: -.1px; }
+.toast-text { font-size: 12px; color: var(--text); font-weight: 700; }
 
 /* ============================================================
    MARKER
@@ -2111,11 +1882,7 @@ body > * { position: relative; z-index: 1; }
   transition: all var(--t-spring);
 }
 
-.node-marker:hover {
-  transform: scale(1.5);
-  box-shadow: 0 0 30px var(--primary);
-}
-
+.node-marker:hover { transform: scale(1.5); box-shadow: 0 0 30px var(--primary); }
 .node-marker.offline { background: var(--danger); box-shadow: 0 0 18px var(--danger); }
 .node-marker.lowbat { background: var(--warning); box-shadow: 0 0 18px var(--warning); }
 
@@ -2127,6 +1894,54 @@ body > * { position: relative; z-index: 1; }
   animation: ringPulse 1.8s ease-out infinite;
   pointer-events: none;
 }
+
+/* ============================================================
+   PWA INSTALL BANNER
+   ============================================================ */
+#pwa-install-btn {
+  position: fixed;
+  bottom: calc(var(--sp-5) + var(--safe-bottom));
+  right: calc(var(--sp-5) + var(--safe-right));
+  padding: var(--sp-3) var(--sp-5);
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+  border: none;
+  border-radius: var(--r-4);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--primary-glow);
+  z-index: 9998;
+  animation: slideInUp .5s var(--t-spring);
+  transition: all var(--t-base);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+#pwa-install-btn:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 32px var(--primary-glow); }
+#pwa-install-btn:active { transform: scale(.97); }
+
+/* Offline badge */
+#offline-badge {
+  position: fixed;
+  top: calc(80px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--warning);
+  color: #000;
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 800;
+  z-index: 9997;
+  display: none;
+  box-shadow: var(--shadow-3);
+  animation: slideDown .3s var(--t-spring);
+}
+
+#offline-badge.show { display: block; }
 
 /* ============================================================
    RESPONSIVE
@@ -2174,12 +1989,7 @@ body > * { position: relative; z-index: 1; }
   .modal { border-radius: var(--r-5) var(--r-5) 0 0; max-height: 90vh; }
   .modal-grid { grid-template-columns: 1fr; }
 
-  .toast-container {
-    top: calc(64px + var(--safe-top));
-    left: var(--sp-4);
-    right: var(--sp-4);
-    max-width: 100%;
-  }
+  .toast-container { top: calc(64px + var(--safe-top)); left: var(--sp-4); right: var(--sp-4); max-width: 100%; }
 
   .login-container { padding: var(--sp-6) var(--sp-5); }
   .login-logo-icon { font-size: 56px; }
@@ -2191,6 +2001,8 @@ body > * { position: relative; z-index: 1; }
 
   .virtual-scroll-container { height: 420px; }
   .virtual-item { padding: var(--sp-3); margin: var(--sp-1) var(--sp-1); }
+
+  #pwa-install-btn { bottom: calc(var(--sp-4) + var(--safe-bottom)); right: var(--sp-4); padding: var(--sp-2) var(--sp-4); font-size: 12px; }
 }
 </style>
 </head>
@@ -2199,9 +2011,7 @@ body > * { position: relative; z-index: 1; }
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-container">
-    <div class="login-logo">
-      <div class="login-logo-icon">🌲</div>
-    </div>
+    <div class="login-logo"><div class="login-logo-icon">🌲</div></div>
     <h1 class="login-title">EcoAcoustic-AI</h1>
     <p class="login-subtitle">OGM Komuta Merkezi — Güvenli Giriş</p>
 
@@ -2315,37 +2125,22 @@ body > * { position: relative; z-index: 1; }
 
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Aktif Düğüm</span>
-          <div class="kpi-icon">📡</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Aktif Düğüm</span><div class="kpi-icon">📡</div></div>
         <div class="kpi-value" id="kpiNodes">0/8</div>
         <span class="kpi-change">▲ Tümü çalışıyor</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Bugünkü Alarm</span>
-          <div class="kpi-icon">🚨</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Bugünkü Alarm</span><div class="kpi-icon">🚨</div></div>
         <div class="kpi-value" id="kpiAlerts">0</div>
         <span class="kpi-change">▲ Son 1 saat</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Ortalama Doğruluk</span>
-          <div class="kpi-icon">🎯</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Ortalama Doğruluk</span><div class="kpi-icon">🎯</div></div>
         <div class="kpi-value" id="kpiConf">0%</div>
         <span class="kpi-change">▲ Stabil</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Sistem Gecikmesi</span>
-          <div class="kpi-icon">⚡</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Sistem Gecikmesi</span><div class="kpi-icon">⚡</div></div>
         <div class="kpi-value" id="kpiLatency">1.2s</div>
         <span class="kpi-change down">▼ İyileşme</span>
       </div>
@@ -2359,11 +2154,8 @@ body > * { position: relative; z-index: 1; }
             <span>Canlı Tehdit Haritası</span>
             <span class="chip live">Erzurum</span>
           </div>
-          <div class="card-actions">
-            <span class="chip" id="alertCountChip">0 alarm</span>
-          </div>
+          <div class="card-actions"><span class="chip" id="alertCountChip">0 alarm</span></div>
         </div>
-
         <div class="map-container">
           <div id="map"></div>
           <div class="map-overlay-top">
@@ -2384,26 +2176,11 @@ body > * { position: relative; z-index: 1; }
           <div class="map-overlay-bottom">
             <div class="map-legend">
               <div class="map-legend-title">Gösterge</div>
-              <div class="map-legend-item">
-                <div class="map-legend-dot" style="background:#2ea043;color:#2ea043;"></div>
-                <span>Aktif Düğüm</span>
-              </div>
-              <div class="map-legend-item">
-                <div class="map-legend-dot" style="background:#f0b429;color:#f0b429;"></div>
-                <span>Testere</span>
-              </div>
-              <div class="map-legend-item">
-                <div class="map-legend-dot" style="background:#ff6b35;color:#ff6b35;"></div>
-                <span>Yangın</span>
-              </div>
-              <div class="map-legend-item">
-                <div class="map-legend-dot" style="background:#e5484d;color:#e5484d;"></div>
-                <span>Silah</span>
-              </div>
-              <div class="map-legend-item">
-                <div class="map-legend-dot" style="background:#a371f7;color:#a371f7;"></div>
-                <span>Kurcalama</span>
-              </div>
+              <div class="map-legend-item"><div class="map-legend-dot" style="background:#2ea043;color:#2ea043;"></div><span>Aktif Düğüm</span></div>
+              <div class="map-legend-item"><div class="map-legend-dot" style="background:#f0b429;color:#f0b429;"></div><span>Testere</span></div>
+              <div class="map-legend-item"><div class="map-legend-dot" style="background:#ff6b35;color:#ff6b35;"></div><span>Yangın</span></div>
+              <div class="map-legend-item"><div class="map-legend-dot" style="background:#e5484d;color:#e5484d;"></div><span>Silah</span></div>
+              <div class="map-legend-item"><div class="map-legend-dot" style="background:#a371f7;color:#a371f7;"></div><span>Kurcalama</span></div>
             </div>
           </div>
         </div>
@@ -2411,13 +2188,8 @@ body > * { position: relative; z-index: 1; }
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">⚡</span>
-            <span>Aktivite</span>
-          </div>
-          <div class="card-actions">
-            <span class="chip live">Canlı</span>
-          </div>
+          <div class="card-title"><span class="card-title-icon">⚡</span><span>Aktivite</span></div>
+          <div class="card-actions"><span class="chip live">Canlı</span></div>
         </div>
         <div class="activity-feed" id="activityFeed"></div>
       </div>
@@ -2425,36 +2197,15 @@ body > * { position: relative; z-index: 1; }
 
     <div class="bottom-grid">
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">📈</span>
-            <span>Tehdit Dağılımı</span>
-          </div>
-        </div>
-        <div class="chart-container">
-          <canvas id="threatChart"></canvas>
-        </div>
+        <div class="card-header"><div class="card-title"><span class="card-title-icon">📈</span><span>Tehdit Dağılımı</span></div></div>
+        <div class="chart-container"><canvas id="threatChart"></canvas></div>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">📊</span>
-            <span>Saatlik</span>
-          </div>
-        </div>
-        <div class="chart-container">
-          <canvas id="hourlyChart"></canvas>
-        </div>
+        <div class="card-header"><div class="card-title"><span class="card-title-icon">📊</span><span>Saatlik</span></div></div>
+        <div class="chart-container"><canvas id="hourlyChart"></canvas></div>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="card-title-icon">🔋</span>
-            <span>Pil Durumu</span>
-          </div>
-        </div>
+        <div class="card-header"><div class="card-title"><span class="card-title-icon">🔋</span><span>Pil Durumu</span></div></div>
         <div class="chart-container" style="height: 260px; padding: var(--sp-4);">
           <div id="batteryList"></div>
         </div>
@@ -2463,11 +2214,7 @@ body > * { position: relative; z-index: 1; }
 
     <div class="card" style="margin-bottom: var(--sp-5);">
       <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">📡</span>
-          <span>Aktif Düğümler</span>
-          <span class="chip" id="nodeCountChip">8 düğüm</span>
-        </div>
+        <div class="card-title"><span class="card-title-icon">📡</span><span>Aktif Düğümler</span><span class="chip" id="nodeCountChip">8 düğüm</span></div>
       </div>
       <div class="nodes-grid" id="nodesGrid"></div>
     </div>
@@ -2478,10 +2225,7 @@ body > * { position: relative; z-index: 1; }
     <div class="welcome">
       <div>
         <h1 class="welcome-title">🚨 <span>Alarmlar</span></h1>
-        <div class="welcome-status">
-          <span class="status-dot"></span>
-          <span id="alertsCountText">0 alarm kayıtlı</span>
-        </div>
+        <div class="welcome-status"><span class="status-dot"></span><span id="alertsCountText">0 alarm kayıtlı</span></div>
       </div>
       <div class="welcome-time" id="alertsClock">--:--:--</div>
     </div>
@@ -2497,9 +2241,7 @@ body > * { position: relative; z-index: 1; }
             <option value="gunshot">🔫 Silah</option>
             <option value="tamper">⚠️ Kurcalama</option>
           </select>
-          <select id="nodeFilter" class="settings-select">
-            <option value="all">Tüm düğümler</option>
-          </select>
+          <select id="nodeFilter" class="settings-select"><option value="all">Tüm düğümler</option></select>
         </div>
       </div>
       <div class="virtual-scroll-container" id="alertListFull">
@@ -2516,17 +2258,11 @@ body > * { position: relative; z-index: 1; }
     <div class="welcome">
       <div>
         <h1 class="welcome-title">📡 <span>Düğümler</span></h1>
-        <div class="welcome-status">
-          <span class="status-dot"></span>
-          <span id="nodesStatusText">8 düğüm aktif</span>
-        </div>
+        <div class="welcome-status"><span class="status-dot"></span><span id="nodesStatusText">8 düğüm aktif</span></div>
       </div>
       <div class="welcome-time" id="nodesClock">--:--:--</div>
     </div>
-
-    <div class="card">
-      <div class="nodes-grid" id="nodesGridFull"></div>
-    </div>
+    <div class="card"><div class="nodes-grid" id="nodesGridFull"></div></div>
   </div>
 
   <!-- ANALYTICS -->
@@ -2534,74 +2270,42 @@ body > * { position: relative; z-index: 1; }
     <div class="welcome">
       <div>
         <h1 class="welcome-title">📊 <span>Analitik</span></h1>
-        <div class="welcome-status">
-          <span class="status-dot"></span>
-          <span>Sistem istatistikleri</span>
-        </div>
+        <div class="welcome-status"><span class="status-dot"></span><span>Sistem istatistikleri</span></div>
       </div>
       <div class="welcome-time" id="analyticsClock">--:--:--</div>
     </div>
 
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Toplam Alarm</span>
-          <div class="kpi-icon">📈</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Toplam Alarm</span><div class="kpi-icon">📈</div></div>
         <div class="kpi-value" id="analyticsTotal">0</div>
         <span class="kpi-change">Tüm zamanlar</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Bugün</span>
-          <div class="kpi-icon">📅</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Bugün</span><div class="kpi-icon">📅</div></div>
         <div class="kpi-value" id="analyticsToday">0</div>
         <span class="kpi-change">Son 24 saat</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">En Çok Tehdit</span>
-          <div class="kpi-icon">🎯</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">En Çok Tehdit</span><div class="kpi-icon">🎯</div></div>
         <div class="kpi-value" id="analyticsTop" style="font-size: 22px;">—</div>
         <span class="kpi-change">Son 7 gün</span>
       </div>
-
       <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Ortalama Güven</span>
-          <div class="kpi-icon">✅</div>
-        </div>
+        <div class="kpi-header"><span class="kpi-label">Ortalama Güven</span><div class="kpi-icon">✅</div></div>
         <div class="kpi-value" id="analyticsAvg">0%</div>
         <span class="kpi-change">Tüm alarmlar</span>
       </div>
     </div>
 
     <div class="card" style="margin-bottom: var(--sp-4);">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">📊</span>
-          <span>Tehdit Tipine Göre Dağılım</span>
-        </div>
-      </div>
-      <div class="chart-container" style="height: 320px;">
-        <canvas id="analyticsChart1"></canvas>
-      </div>
+      <div class="card-header"><div class="card-title"><span class="card-title-icon">📊</span><span>Tehdit Tipine Göre Dağılım</span></div></div>
+      <div class="chart-container" style="height: 320px;"><canvas id="analyticsChart1"></canvas></div>
     </div>
 
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="card-title-icon">📈</span>
-          <span>Saatlik Yoğunluk</span>
-        </div>
-      </div>
-      <div class="chart-container" style="height: 320px;">
-        <canvas id="analyticsChart2"></canvas>
-      </div>
+      <div class="card-header"><div class="card-title"><span class="card-title-icon">📈</span><span>Saatlik Yoğunluk</span></div></div>
+      <div class="chart-container" style="height: 320px;"><canvas id="analyticsChart2"></canvas></div>
     </div>
   </div>
 
@@ -2610,10 +2314,7 @@ body > * { position: relative; z-index: 1; }
     <div class="welcome">
       <div>
         <h1 class="welcome-title">⚙️ <span>Ayarlar</span></h1>
-        <div class="welcome-status">
-          <span class="status-dot"></span>
-          <span>Sistem tercihleri</span>
-        </div>
+        <div class="welcome-status"><span class="status-dot"></span><span>Sistem tercihleri</span></div>
       </div>
     </div>
 
@@ -2626,43 +2327,19 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Sesli Uyarı</div>
-              <div class="settings-item-desc">Alarm geldiğinde ses çal</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingSound" checked>
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Sesli Uyarı</div><div class="settings-item-desc">Alarm geldiğinde ses çal</div></div>
+            <label class="toggle"><input type="checkbox" id="settingSound" checked><span class="toggle-slider"></span></label>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Tarayıcı Bildirimi</div>
-              <div class="settings-item-desc">Masaüstü bildirimleri göster</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingNotification" checked>
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Tarayıcı Bildirimi</div><div class="settings-item-desc">Masaüstü bildirimleri göster</div></div>
+            <label class="toggle"><input type="checkbox" id="settingNotification" checked><span class="toggle-slider"></span></label>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Toast Bildirimleri</div>
-              <div class="settings-item-desc">Sağ üstte bildirim göster</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingToast" checked>
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Toast Bildirimleri</div><div class="settings-item-desc">Sağ üstte bildirim göster</div></div>
+            <label class="toggle"><input type="checkbox" id="settingToast" checked><span class="toggle-slider"></span></label>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Ses Seviyesi</div>
-              <div class="settings-item-desc">Alarm sesi seviyesi</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Ses Seviyesi</div><div class="settings-item-desc">Alarm sesi seviyesi</div></div>
             <input type="range" class="settings-range" id="settingVolume" min="0" max="100" value="15" />
           </div>
         </div>
@@ -2675,37 +2352,20 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Varsayılan Katman</div>
-              <div class="settings-item-desc">Harita açıldığında görünecek katman</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Varsayılan Katman</div><div class="settings-item-desc">Harita açıldığında görünecek katman</div></div>
             <select class="settings-select" id="settingMapLayer">
               <option value="satellite">🛰️ Uydu</option>
               <option value="terrain">🏔️ Topoğrafya</option>
               <option value="streets">🗺️ Sokak</option>
             </select>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Otomatik Zoom</div>
-              <div class="settings-item-desc">Yeni alarmda haritayı yakınlaştır</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingAutoZoom" checked>
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Otomatik Zoom</div><div class="settings-item-desc">Yeni alarmda haritayı yakınlaştır</div></div>
+            <label class="toggle"><input type="checkbox" id="settingAutoZoom" checked><span class="toggle-slider"></span></label>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Isı Haritası</div>
-              <div class="settings-item-desc">Alarm yoğunluğunu göster</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingHeatmap">
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Isı Haritası</div><div class="settings-item-desc">Alarm yoğunluğunu göster</div></div>
+            <label class="toggle"><input type="checkbox" id="settingHeatmap"><span class="toggle-slider"></span></label>
           </div>
         </div>
       </div>
@@ -2758,10 +2418,7 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Otomatik Yenileme</div>
-              <div class="settings-item-desc">Verileri otomatik güncelle</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Otomatik Yenileme</div><div class="settings-item-desc">Verileri otomatik güncelle</div></div>
             <select class="settings-select" id="settingRefresh">
               <option value="5">5 saniye</option>
               <option value="10" selected>10 saniye</option>
@@ -2769,16 +2426,9 @@ body > * { position: relative; z-index: 1; }
               <option value="60">1 dakika</option>
             </select>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Demo Modu</div>
-              <div class="settings-item-desc">Test için sahte veri</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingDemo" checked>
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="settings-item-info"><div class="settings-item-label">Demo Modu</div><div class="settings-item-desc">Test için sahte veri</div></div>
+            <label class="toggle"><input type="checkbox" id="settingDemo" checked><span class="toggle-slider"></span></label>
           </div>
         </div>
       </div>
@@ -2790,26 +2440,15 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Veriyi Dışa Aktar</div>
-              <div class="settings-item-desc">Tüm alarm verisini JSON olarak indir</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Veriyi Dışa Aktar</div><div class="settings-item-desc">Tüm alarm verisini JSON olarak indir</div></div>
             <button class="btn" id="settingExportBtn" style="flex: 0; padding: var(--sp-2) var(--sp-4);">📥 İndir</button>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Önbelleği Temizle</div>
-              <div class="settings-item-desc">Yerel depolamayı temizle</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Önbelleği Temizle</div><div class="settings-item-desc">Yerel depolamayı temizle</div></div>
             <button class="btn" id="settingClearCacheBtn" style="flex: 0; padding: var(--sp-2) var(--sp-4);">🗑️ Temizle</button>
           </div>
-
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Tüm Verileri Sil</div>
-              <div class="settings-item-desc">Geri alınamaz — dikkatli kullanın</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Tüm Verileri Sil</div><div class="settings-item-desc">Geri alınamaz — dikkatli kullanın</div></div>
             <button class="btn-danger-outline" id="settingResetBtn">⚠️ Sıfırla</button>
           </div>
         </div>
@@ -2822,22 +2461,13 @@ body > * { position: relative; z-index: 1; }
         </div>
         <div class="settings-list">
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Sürüm</div>
-              <div class="settings-item-desc">v4.0.0 — TEKNOFEST 2026</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Sürüm</div><div class="settings-item-desc">v4.1.0 — PWA — TEKNOFEST 2026</div></div>
           </div>
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Takım</div>
-              <div class="settings-item-desc">Teknotim — Çevre ve Enerji Teknolojileri</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Takım</div><div class="settings-item-desc">Teknotim — Çevre ve Enerji Teknolojileri</div></div>
           </div>
           <div class="settings-item">
-            <div class="settings-item-info">
-              <div class="settings-item-label">Geliştirici</div>
-              <div class="settings-item-desc">EcoAcoustic-AI Ekibi</div>
-            </div>
+            <div class="settings-item-info"><div class="settings-item-label">Geliştirici</div><div class="settings-item-desc">EcoAcoustic-AI Ekibi</div></div>
           </div>
         </div>
       </div>
@@ -2869,11 +2499,66 @@ body > * { position: relative; z-index: 1; }
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- OFFLINE BADGE -->
+<div id="offline-badge">📴 Çevrimdışı Mod — Önbellekten Gösteriliyor</div>
+
+<!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
+// ============================================================
+// PWA SERVICE WORKER + INSTALL PROMPT
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then((reg) => console.log('%c✅ PWA Service Worker kayıtlı', 'color:#2ea043;font-weight:bold;', reg.scope))
+      .catch((err) => console.warn('⚠️ SW kayıt hatası:', err));
+  });
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('📱 PWA yüklenebilir');
+  showInstallButton();
+});
+
+function showInstallButton() {
+  if (document.getElementById('pwa-install-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'pwa-install-btn';
+  btn.innerHTML = '<span>📱</span><span>Uygulamayı Yükle</span>';
+  btn.onclick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`PWA install: ${outcome}`);
+      deferredPrompt = null;
+      btn.remove();
+    }
+  };
+  document.body.appendChild(btn);
+}
+
+window.addEventListener('appinstalled', () => {
+  console.log('✅ PWA yüklendi');
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.remove();
+});
+
+// Online/Offline detection
+window.addEventListener('online', () => {
+  document.getElementById('offline-badge').classList.remove('show');
+});
+window.addEventListener('offline', () => {
+  document.getElementById('offline-badge').classList.add('show');
+});
+if (!navigator.onLine) document.getElementById('offline-badge').classList.add('show');
+
 // ============================================================
 // USERS
 // ============================================================
@@ -2956,14 +2641,14 @@ class DemoDataEngine {
     };
   }
 
-  start(intervalMs = 7000) {
+  start(intervalMs = 15000) {
     if (this.running) return;
     this.running = true;
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 8; i++) {
       setTimeout(() => {
         const a = this.generateAlert();
         if (a) { this.alerts.unshift(a); this.emit({ type: 'alert', data: a }); }
-      }, i * 400);
+      }, i * 1000);
     }
     this.interval = setInterval(() => {
       const alert = this.generateAlert();
@@ -3276,7 +2961,7 @@ class EcoAcousticApp {
       const navbar = document.getElementById('navbar');
       if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 10);
     });
-    console.log('%c⚡ EcoAcoustic-AI v4.0 — Pro Tasarım', 'color:#2ea043;font-size:14px;font-weight:800;');
+    console.log('%c⚡ EcoAcoustic-AI v4.1 — PWA', 'color:#2ea043;font-size:14px;font-weight:800;');
   }
 
   bindLogin() {
@@ -3358,11 +3043,7 @@ class EcoAcousticApp {
       e.stopPropagation();
       document.getElementById('userDropdown').classList.toggle('show');
     });
-
-    document.addEventListener('click', () => {
-      document.getElementById('userDropdown').classList.remove('show');
-    });
-
+    document.addEventListener('click', () => document.getElementById('userDropdown').classList.remove('show'));
     document.getElementById('userDropdown').addEventListener('click', (e) => e.stopPropagation());
 
     document.querySelectorAll('.user-dropdown-item').forEach(item => {
@@ -3386,7 +3067,6 @@ class EcoAcousticApp {
     });
 
     document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
-
     document.getElementById('alertsBtn').addEventListener('click', () => {
       this.unreadAlerts = 0;
       this.updateBadge();
@@ -3436,12 +3116,18 @@ class EcoAcousticApp {
 
     document.getElementById('settingClearCacheBtn').addEventListener('click', () => {
       localStorage.removeItem('ecoacoustic_settings');
+      if ('caches' in window) {
+        caches.keys().then(names => names.forEach(n => caches.delete(n)));
+      }
       this.toast.show('🗑️ Önbellek temizlendi', 'success');
     });
 
     document.getElementById('settingResetBtn').addEventListener('click', () => {
       if (confirm('Tüm veriler silinecek. Emin misiniz?')) {
         localStorage.clear();
+        if ('caches' in window) {
+          caches.keys().then(names => names.forEach(n => caches.delete(n)));
+        }
         this.toast.show('⚠️ Tüm veriler silindi', 'warning');
         setTimeout(() => location.reload(), 1500);
       }
@@ -3575,7 +3261,6 @@ class EcoAcousticApp {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#a1a1a1', font: { size: 11, weight: '600' }, padding: 12, boxWidth: 10, boxHeight: 10 } } }, cutout: '70%' }
       });
     }
-
     const c2 = document.getElementById('hourlyChart');
     if (c2) {
       const grad = c2.getContext('2d').createLinearGradient(0, 0, 0, 200);
@@ -3587,7 +3272,6 @@ class EcoAcousticApp {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#666', font: { size: 9 } }, grid: { display: false }, border: { display: false } }, y: { ticks: { color: '#666', font: { size: 9 } }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true } } }
       });
     }
-
     const c3 = document.getElementById('analyticsChart1');
     if (c3) {
       this.charts.analytics1 = new Chart(c3.getContext('2d'), {
@@ -3596,7 +3280,6 @@ class EcoAcousticApp {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a1a1a1', font: { size: 12, weight: '700' } }, grid: { display: false }, border: { display: false } }, y: { ticks: { color: '#666' }, grid: { color: '#1f1f1f' }, border: { display: false }, beginAtZero: true } } }
       });
     }
-
     const c4 = document.getElementById('analyticsChart2');
     if (c4) {
       this.charts.analytics2 = new Chart(c4.getContext('2d'), {
@@ -3894,7 +3577,7 @@ class EcoAcousticApp {
   }
 
   exportData() {
-    const data = { exportTime: new Date().toISOString(), region: 'Erzurum', system: 'EcoAcoustic-AI v4.0', user: this.user ? this.user.name : 'unknown', totalAlerts: this.alerts.length, nodes: this.nodes, alerts: this.alerts };
+    const data = { exportTime: new Date().toISOString(), region: 'Erzurum', system: 'EcoAcoustic-AI v4.1 PWA', user: this.user ? this.user.name : 'unknown', totalAlerts: this.alerts.length, nodes: this.nodes, alerts: this.alerts };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
