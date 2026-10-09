@@ -3078,6 +3078,44 @@ class EcoAcousticApp {
         this.bindMapControls();
         this.bindDemoEngine();
         this.initVirtualScroll();
+        const getStoredAlerts = () => {
+  try { return JSON.parse(localStorage.getItem('ecoacoustic_alerts') || '[]'); }
+  catch(e) { return []; }
+};
+
+const storedAlerts = getStoredAlerts();
+if (storedAlerts.length > 0) {
+  storedAlerts.slice(0, 100).forEach(a => {
+    if (!this.alerts.find(x => x.id === a.id)) {
+      this.alerts.push(a);
+      if (this.map) this.map.addAlert(a);
+    }
+  });
+}
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'ecoacoustic_last_alert' && e.newValue) {
+    try {
+      const info = JSON.parse(e.newValue);
+      const alerts = getStoredAlerts();
+      const newAlert = alerts.find(a => a.id === info.id);
+      if (newAlert && !this.alerts.find(a => a.id === newAlert.id)) {
+        this.alerts.unshift(newAlert);
+        if (this.map) this.map.addAlert(newAlert);
+        this.renderActivity();
+        this.updateVirtualList();
+        this.updateBadge();
+        this.updateKPIs();
+        this.unreadAlerts++;
+        if (newAlert.confidence > 0.91) {
+          this.sound.enabled = true;
+          this.sound.playAlarm(newAlert.threatType);
+        }
+        this.toast.show(`${newAlert.icon} ${newAlert.threatLabel} — ${newAlert.nodeName} (SİMÜLASYON)`, newAlert.threatType === 'fire' ? 'error' : 'warning', 5000);
+      }
+    } catch(err) {}
+  }
+});
         demoEngine.start(15000);
       } else {
         this.map.map.invalidateSize();
